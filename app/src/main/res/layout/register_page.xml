@@ -46,12 +46,30 @@
         android:hint="Confirm Password"
         android:inputType="textPassword" />
 
-    <Spinner
-        android:id="@+id/registerUserType"
-        android:layout_width="match_parent"
+    <!-- Profile Image View -->
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/ic_default_profile" <!-- Placeholder image -->
+        android:contentDescription="Profile Image"
+        android:scaleType="centerCrop"
+        android:background="@drawable/circle_background" <!-- Optional: Circular background -->
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="selectProfileImage" />
+
+    <!-- Optional: Button to Trigger Image Selection -->
+    <Button
+        android:id="@+id/selectImageButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:entries="@array/user_type"
-         />
+        android:text="Select Profile Image"
+        android:layout_gravity="center_horizontal"
+        android:marginTop="16dp"
+        android:onClick="selectProfileImage" />
+
 
     <Button
         android:id="@+id/registerButton"
