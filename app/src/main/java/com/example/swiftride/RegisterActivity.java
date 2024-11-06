@@ -30,11 +30,13 @@ public class RegisterActivity extends Activity {
     private Uri selectedImageUri; // To store the selected image URI
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_page);
         profileImageView = findViewById(R.id.profileImageView);
+
     }
 
     public void selectProfileImage(View view){
@@ -95,11 +97,40 @@ public class RegisterActivity extends Activity {
 
     public void regUser(View view){
         EditText userNameEdt = findViewById(R.id.usernameRegister);
+        String userName = userNameEdt.getText().toString();
+
         EditText dobEdt = findViewById(R.id.dobRegister);
+        String userDob = dobEdt.getText().toString();
+
         EditText emailEdt = findViewById(R.id.emailRegister);
+        String userEmail = emailEdt.getText().toString();
+
         EditText pwEdt = findViewById(R.id.registerPassword);
+        String password = pwEdt.getText().toString().trim();
+
         EditText confirmPwEdt = findViewById(R.id.registerConfirmPassword);
+        String confirmPassword = confirmPwEdt.getText().toString().trim();
 
+        //Image path
+        String imgPath = (selectedImageUri != null) ? selectedImageUri.toString() : ""; // Use selected image path if available
 
+        if(userName.isEmpty() || userDob.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()){
+            Toast.makeText(this, "Please fill all text fields", Toast.LENGTH_SHORT).show();
+        }
+
+        if(!password.equals(confirmPassword)){
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+        }
+        DBHandler dbHandler = new DBHandler(this);
+        dbHandler.regNewUser(userName, userDob, userEmail,  confirmPassword, imgPath);
+
+        Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show();
+
+        userNameEdt.setText("");
+        dobEdt.setText("");
+        emailEdt.setText("");
+        pwEdt.setText("");
+        confirmPwEdt.setText("");
+        profileImageView.setImageResource(R.drawable.ic_default_profile);
     }
 }

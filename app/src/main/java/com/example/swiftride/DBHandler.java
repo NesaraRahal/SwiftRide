@@ -20,7 +20,8 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DOB_COL = "dob";
     private static final String USER_EMAIL_COL = "email";
     private static final String PROFILE_IMG_COL = "profile_img_path";
-    private static final String USER_TYPE_COL = "user_type";
+    private static final String PASSWORD_COL = "password";
+
 
     // creating a constructor for our database handler.
     public DBHandler(Context context) {
@@ -36,7 +37,8 @@ public class DBHandler extends SQLiteOpenHelper {
                 + DOB_COL + " DATE,"
                 + USER_EMAIL_COL + " TEXT,"
                 + PROFILE_IMG_COL + " TEXT,"
-                + USER_TYPE_COL + " TEXT )";
+                + PASSWORD_COL + " TEXT)";
+
 
         // at last we are calling a exec sql
         // method to execute above sql query
@@ -45,7 +47,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
     // this method is use to add new course to our sqlite database.
-    public void regNewUser(String userName, String userDOB, String userEmail, String profileImgPpath, String userType) {
+    public void regNewUser(String userName, String userDOB, String userEmail, String password, String profileImgPath ) {
 
         // on below line we are creating a variable for
         // our sqlite database and calling writable method
@@ -61,8 +63,9 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(USER_NAME_COL, userName);
         values.put(DOB_COL, userDOB);
         values.put(USER_EMAIL_COL, userEmail);
-        values.put(PROFILE_IMG_COL, profileImgPpath);
-        values.put(USER_TYPE_COL, userType);
+        values.put(PROFILE_IMG_COL, profileImgPath);
+        values.put(PASSWORD_COL, password);
+
 
 
         // after adding all values we are passing
