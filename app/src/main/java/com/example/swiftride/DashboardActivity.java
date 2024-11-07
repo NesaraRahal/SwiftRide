@@ -13,8 +13,8 @@ public class DashboardActivity extends Activity {
 
     }
 
-    public void regBus(View view){
-        Intent intent = new Intent(this, RegisterBusActivity.class);
+    public void regOwner(View view){
+        Intent intent = new Intent(this, RegOwnerActivity.class);
         startActivity(intent);
     }
 

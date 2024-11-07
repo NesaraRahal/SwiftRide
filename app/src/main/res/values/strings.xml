@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">SwiftRide</string>
+    <string name="reg_owner">Do You Have a Bus</string>
+    <string name="reg_ownerBtn">Join with us</string>
     <string name="reg_bus">Register you Bus</string>
     <string-array name="user_type">
         <item>Passenger</item>

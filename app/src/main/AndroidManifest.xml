@@ -30,7 +30,7 @@
         <activity android:name=".RegisterActivity"></activity>
         <activity android:name=".DashboardActivity" />
         <activity android:name=".RegisterBusActivity" />
-
+        <activity android:name=".RegOwnerActivity" />
 
     </application>
 

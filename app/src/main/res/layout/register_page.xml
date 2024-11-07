@@ -14,11 +14,18 @@
         android:gravity="center"
         android:layout_gravity="center_horizontal" />
 
+
     <EditText
         android:id="@+id/usernameRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Username" />
+
+    <EditText
+        android:id="@+id/userNICRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="NIC" />
 
     <EditText
         android:id="@+id/dobRegister"

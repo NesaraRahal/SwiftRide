@@ -12,7 +12,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -24,6 +24,12 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String PASSWORD_COL = "password";
 
 
+
+    // Owner table
+    private static final String TABLE_OWNER = "owner";
+    private static final String OWNER_ID_COL = "owner_id";
+    private static final String OWNER_NIC_COL = "nic"; // foreign key referencing user_id
+
     // creating a constructor for our database handler.
     public DBHandler(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -33,22 +39,26 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String createUserTable = "CREATE TABLE " + TABLE_USER + " ("
-                + USER_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID_COL + " INTEGER PRIMARY KEY NOT NULL, "
                 + USER_NAME_COL + " TEXT,"
                 + DOB_COL + " DATE,"
                 + USER_EMAIL_COL + " TEXT,"
                 + PROFILE_IMG_COL + " TEXT,"
                 + PASSWORD_COL + " TEXT)";
 
-
-        // at last we are calling a exec sql
         // method to execute above sql query
         db.execSQL(createUserTable);
+
+        String createOwnerTable = "CREATE TABLE " + TABLE_OWNER + " ("
+                + OWNER_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + OWNER_NIC_COL + " INTEGER, "
+                + "FOREIGN KEY(" + OWNER_NIC_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "))";
+        db.execSQL(createOwnerTable);
     }
 
 
     // this method is use to add new course to our sqlite database.
-    public void regNewUser(String userName, String userDOB, String userEmail, String password, String profileImgPath ) {
+    public void regNewUser(String nicUser,String userName, String userDOB, String userEmail, String password, String profileImgPath ) {
 
         // on below line we are creating a variable for
         // our sqlite database and calling writable method
@@ -61,6 +71,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         // on below line we are passing all values
         // along with its key and value pair.
+        values.put(USER_ID_COL, nicUser);
         values.put(USER_NAME_COL, userName);
         values.put(DOB_COL, userDOB);
         values.put(USER_EMAIL_COL, userEmail);
@@ -91,6 +102,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // this method is called to check if the table exists already.
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_OWNER);
         onCreate(db);
     }
 

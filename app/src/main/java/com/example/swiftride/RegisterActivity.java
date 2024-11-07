@@ -99,6 +99,9 @@ public class RegisterActivity extends Activity {
         EditText userNameEdt = findViewById(R.id.usernameRegister);
         String userName = userNameEdt.getText().toString();
 
+        EditText userNICEdt = findViewById(R.id.userNICRegister);
+        String userNic = userNICEdt.getText().toString();
+
         EditText dobEdt = findViewById(R.id.dobRegister);
         String userDob = dobEdt.getText().toString();
 
@@ -114,7 +117,7 @@ public class RegisterActivity extends Activity {
         //Image path
         String imgPath = (selectedImageUri != null) ? selectedImageUri.toString() : ""; // Use selected image path if available
 
-        if(userName.isEmpty() || userDob.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()){
+        if(userName.isEmpty() || userNic.isEmpty() || userDob.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()){
             Toast.makeText(this, "Please fill all text fields", Toast.LENGTH_SHORT).show();
         }
 
@@ -122,12 +125,14 @@ public class RegisterActivity extends Activity {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
         }
         DBHandler dbHandler = new DBHandler(this);
-        dbHandler.regNewUser(userName, userDob, userEmail,  confirmPassword, imgPath);
+        dbHandler.regNewUser(userNic, userName, userDob, userEmail,  confirmPassword, imgPath);
 
         Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show();
 
         userNameEdt.setText("");
+
         dobEdt.setText("");
+        userNICEdt.setText("");
         emailEdt.setText("");
         pwEdt.setText("");
         confirmPwEdt.setText("");

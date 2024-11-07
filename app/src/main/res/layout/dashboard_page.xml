@@ -13,29 +13,40 @@
         <!-- Additional Views can go inside this RelativeLayout -->
 
         <ImageView
-            android:id="@+id/profileImageView"
+            android:id="@+id/busImg"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="center_horizontal"
             android:clickable="true"
-            android:contentDescription="Register Image"
+            android:contentDescription="Become a owner"
             android:focusable="true"
-            android:onClick="selectProfileImage"
+            android:onClick="regOwner"
             android:scaleType="centerCrop"
-            android:src="@drawable/modern_bus"
-            />
+            android:src="@drawable/modern_bus" />
 
-        <Button
-            android:id="@+id/textView"
+        <TextView
+            android:id="@+id/textOwner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:layout_alignEnd="@+id/busImg"
             android:layout_marginLeft="100px"
             android:layout_marginTop="150px"
-            android:layout_marginEnd="2dp"
-            android:text="@string/reg_bus"
-            android:textSize="20sp"
-            android:onClick="regBus"/>
+            android:layout_marginEnd="-185dp"
+            android:text="@string/reg_owner"
+            android:textSize="19sp" />
+
+        <Button
+            android:id="@+id/textBeOwner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textOwner"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="100px"
+            android:layout_marginTop="26dp"
+            android:layout_marginEnd="33dp"
+            android:onClick="regOwner"
+            android:text="@string/reg_ownerBtn"
+            android:textSize="19sp" />
 
     </RelativeLayout>
 
