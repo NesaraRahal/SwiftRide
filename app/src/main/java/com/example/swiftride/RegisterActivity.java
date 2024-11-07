@@ -132,5 +132,8 @@ public class RegisterActivity extends Activity {
         pwEdt.setText("");
         confirmPwEdt.setText("");
         profileImageView.setImageResource(R.drawable.ic_default_profile);
+
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

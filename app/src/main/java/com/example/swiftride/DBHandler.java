@@ -2,6 +2,7 @@ package com.example.swiftride;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -11,7 +12,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 3;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -76,6 +77,16 @@ public class DBHandler extends SQLiteOpenHelper {
         // database after adding database.
         db.close();
     }
+    public boolean isValid(String email, String password){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE " + USER_EMAIL_COL + " = ? AND " + PASSWORD_COL + " = ?", new String[]{email, password});
+
+        boolean userExists = cursor.getCount() > 0;
+        cursor.close();
+        return userExists;
+    }
+
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // this method is called to check if the table exists already.
