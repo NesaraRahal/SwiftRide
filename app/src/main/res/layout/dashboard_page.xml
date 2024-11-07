@@ -1,0 +1,42 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Inner RelativeLayout within LinearLayout -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Additional Views can go inside this RelativeLayout -->
+
+        <ImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:clickable="true"
+            android:contentDescription="Register Image"
+            android:focusable="true"
+            android:onClick="selectProfileImage"
+            android:scaleType="centerCrop"
+            android:src="@drawable/modern_bus"
+            />
+
+        <Button
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="100px"
+            android:layout_marginTop="150px"
+            android:layout_marginEnd="2dp"
+            android:text="@string/reg_bus"
+            android:textSize="20sp"
+            android:onClick="regBus"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
