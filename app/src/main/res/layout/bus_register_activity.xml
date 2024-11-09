@@ -1,0 +1,114 @@
+<!-- activity_login.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Your Bus"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal" />
+
+    <EditText
+        android:id="@+id/routeNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Route Number eg:- 154" />
+
+    <EditText
+        android:id="@+id/routeStartRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Start" />
+
+    <EditText
+        android:id="@+id/routeDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Destination" />
+
+
+    <EditText
+        android:id="@+id/seatNumberRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Number of seats" />
+
+    <EditText
+        android:id="@+id/userNICRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="NIC" />
+
+    <EditText
+        android:id="@+id/dobRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="DD/MM/YY" />
+
+    <EditText
+        android:id="@+id/emailRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email" />
+
+    <Spinner
+        android:id="@+id/userType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/user_type"/>
+
+    <EditText
+        android:id="@+id/registerPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/registerConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Confirm Password"
+        android:inputType="textPassword" />
+
+    <!-- Profile Image View -->
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center_horizontal"
+        android:onClick="selectProfileImage"
+        android:src="@drawable/ic_default_profile"
+        android:contentDescription="Profile Image"
+        android:scaleType="centerCrop"
+        android:clickable="true"
+        android:focusable="true"
+        />
+
+    <Button
+        android:id="@+id/selectImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Profile Image"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:onClick="selectProfileImage" />
+
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="regUser"
+        android:text="Register" />
+
+
+</LinearLayout>

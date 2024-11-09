@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
                 Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, DriverDashboardActivity.class);
                 startActivity(intent);
-            } else if ("Owner".equals(userType)) {
+            } else if ("Bus Owner".equals(userType)) {
                 Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, OwnerDashboardActivity.class);
                 startActivity(intent);
