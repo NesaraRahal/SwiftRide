@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+import android.widget.Toast;
 
 public class DBHandler extends SQLiteOpenHelper {
     // creating a constant variables for our database.
@@ -12,7 +14,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -42,6 +44,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 + USER_ID_COL + " INTEGER PRIMARY KEY NOT NULL, "
                 + USER_NAME_COL + " TEXT,"
                 + DOB_COL + " DATE,"
+                + USER_TYPE_COL + " TEXT,"
                 + USER_EMAIL_COL + " TEXT,"
                 + PROFILE_IMG_COL + " TEXT,"
                 + PASSWORD_COL + " TEXT)";
@@ -54,19 +57,10 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
     // this method is use to add new course to our sqlite database.
-    public void regNewUser(String nicUser,String userName, String userDOB, String userEmail, String password, String profileImgPath, String userType ) {
-
-        // on below line we are creating a variable for
-        // our sqlite database and calling writable method
-        // as we are writing data in our database.
+    public long regNewUser(Context context, String nicUser, String userName, String userDOB, String userEmail, String password, String profileImgPath, String userType) {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // on below line we are creating a
-        // variable for content values.
         ContentValues values = new ContentValues();
 
-        // on below line we are passing all values
-        // along with its key and value pair.
         values.put(USER_ID_COL, nicUser);
         values.put(USER_NAME_COL, userName);
         values.put(DOB_COL, userDOB);
@@ -76,23 +70,51 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(USER_TYPE_COL, userType);
 
 
-
-        // after adding all values we are passing
-        // content values to our table.
-        db.insert(TABLE_USER, null, values);
-
-        // at last we are closing our
-        // database after adding database.
+        // Attempt to insert and return the result
+        long result = db.insert(TABLE_USER, null, values);
         db.close();
+
+        // Show success message only if successful
+        if (result != -1) {
+            Toast.makeText(context, "User registered successfully!", Toast.LENGTH_SHORT).show();
+        }
+
+        return result;
     }
-    public boolean isValid(String email, String password){
+
+    public boolean isValid(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE " + USER_EMAIL_COL + " = ? AND " + PASSWORD_COL + " = ?", new String[]{email, password});
+
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM " + TABLE_USER + " WHERE " + USER_EMAIL_COL + " = ? AND " + PASSWORD_COL + " = ?",
+                new String[]{email, password}
+        );
 
         boolean userExists = cursor.getCount() > 0;
+
+        if (userExists) {
+            Log.d("DBHandler", "User found with email: " + email);
+        } else {
+            Log.d("DBHandler", "No matching user found with email: " + email);
+        }
+
         cursor.close();
         return userExists;
     }
+
+
+    public String userType(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT " + USER_TYPE_COL + " FROM " + TABLE_USER + " WHERE " + USER_EMAIL_COL + " = ?", new String[]{email});
+
+        String userType = null;
+        if (cursor.moveToFirst()) {
+            userType = cursor.getString(0); // Retrieve the user type from the first column
+        }
+        cursor.close();
+        return userType;
+    }
+
 
 
     @Override

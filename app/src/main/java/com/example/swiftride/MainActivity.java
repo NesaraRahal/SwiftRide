@@ -1,19 +1,11 @@
 package com.example.swiftride;
 
-import static android.opengl.ETC1.isValid;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends Activity {
 
@@ -41,15 +33,33 @@ public class MainActivity extends Activity {
             return;
         }
 
-        if(checkCredentials(loginMail, loginPassword)){
 
-            Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, DashboardActivity.class);
-            startActivity(intent);
-        }else{
+        if (checkCredentials(loginMail, loginPassword)) {
+            String userType = checkUser(loginMail);
+            if ("Passenger".equals(userType)) {
+                Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, DashboardActivity.class);
+                startActivity(intent);
+            } else if ("Bus Driver".equals(userType)) {
+                Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, DriverDashboardActivity.class);
+                startActivity(intent);
+            } else if ("Owner".equals(userType)) {
+                Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, OwnerDashboardActivity.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "An error occurred while logging", Toast.LENGTH_SHORT).show();
+            }
+        } else {
             Toast.makeText(this, "Invalid login credentials", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public String checkUser(String loginMail){
+        DBHandler checkType = new DBHandler(this);
+        return checkType.userType(loginMail);
     }
 
     private boolean checkCredentials(String loginMail, String loginPassword) {

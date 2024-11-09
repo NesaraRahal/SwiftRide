@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -118,32 +119,44 @@ public class RegisterActivity extends Activity {
 
         Spinner userTypeSpinner = findViewById(R.id.userType);
         String selectedUserType = userTypeSpinner.getSelectedItem().toString();
+        Log.d("Registration", "Selected User Type: " + selectedUserType);
+        // Image path
+        String imgPath = (selectedImageUri != null) ? selectedImageUri.toString() : "";
 
-        //Image path
-        String imgPath = (selectedImageUri != null) ? selectedImageUri.toString() : ""; // Use selected image path if available
 
-        if(userName.isEmpty() || userNic.isEmpty() || userDob.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || selectedUserType.isEmpty()){
+        // Validate fields
+        if (userName.isEmpty() || userNic.isEmpty() || userDob.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || selectedUserType.isEmpty()) {
             Toast.makeText(this, "Please fill all text fields", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        if(!password.equals(confirmPassword)){
+        if (!password.equals(confirmPassword)) {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        // Register the user
         DBHandler dbHandler = new DBHandler(this);
-        dbHandler.regNewUser(userNic, userName, userDob, userEmail,  confirmPassword, imgPath, selectedUserType);
+        long result = dbHandler.regNewUser(this, userNic, userName, userDob, userEmail, password, imgPath, selectedUserType);
 
-        Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show();
+        if (result == -1) {
+            Toast.makeText(this, "Registration failed. Try a different NIC or email.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        // Reset fields after successful registration
         userNameEdt.setText("");
-
         dobEdt.setText("");
         userNICEdt.setText("");
         emailEdt.setText("");
         pwEdt.setText("");
         confirmPwEdt.setText("");
         profileImageView.setImageResource(R.drawable.ic_default_profile);
+        selectedImageUri = null;  // Reset the image URI
 
+        // Navigate to the main activity
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
+
 }
