@@ -10,6 +10,8 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+
 import android.widget.Toast;
 import android.Manifest;
 
@@ -114,10 +116,13 @@ public class RegisterActivity extends Activity {
         EditText confirmPwEdt = findViewById(R.id.registerConfirmPassword);
         String confirmPassword = confirmPwEdt.getText().toString().trim();
 
+        Spinner userTypeSpinner = findViewById(R.id.userType);
+        String selectedUserType = userTypeSpinner.getSelectedItem().toString();
+
         //Image path
         String imgPath = (selectedImageUri != null) ? selectedImageUri.toString() : ""; // Use selected image path if available
 
-        if(userName.isEmpty() || userNic.isEmpty() || userDob.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()){
+        if(userName.isEmpty() || userNic.isEmpty() || userDob.isEmpty() || userEmail.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || selectedUserType.isEmpty()){
             Toast.makeText(this, "Please fill all text fields", Toast.LENGTH_SHORT).show();
         }
 
@@ -125,7 +130,7 @@ public class RegisterActivity extends Activity {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
         }
         DBHandler dbHandler = new DBHandler(this);
-        dbHandler.regNewUser(userNic, userName, userDob, userEmail,  confirmPassword, imgPath);
+        dbHandler.regNewUser(userNic, userName, userDob, userEmail,  confirmPassword, imgPath, selectedUserType);
 
         Toast.makeText(this, "User registered successfully!", Toast.LENGTH_SHORT).show();
 

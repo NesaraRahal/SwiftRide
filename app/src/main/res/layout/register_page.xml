@@ -39,6 +39,12 @@
         android:layout_height="wrap_content"
         android:hint="Email" />
 
+    <Spinner
+        android:id="@+id/userType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/user_type"/>
+
     <EditText
         android:id="@+id/registerPassword"
         android:layout_width="match_parent"

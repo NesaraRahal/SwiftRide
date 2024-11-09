@@ -23,12 +23,12 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String PROFILE_IMG_COL = "profile_img_path";
     private static final String PASSWORD_COL = "password";
 
+    private static final String USER_TYPE_COL = "userType";
 
 
-    // Owner table
-    private static final String TABLE_OWNER = "owner";
-    private static final String OWNER_ID_COL = "owner_id";
-    private static final String OWNER_NIC_COL = "nic"; // foreign key referencing user_id
+
+
+
 
     // creating a constructor for our database handler.
     public DBHandler(Context context) {
@@ -49,16 +49,12 @@ public class DBHandler extends SQLiteOpenHelper {
         // method to execute above sql query
         db.execSQL(createUserTable);
 
-        String createOwnerTable = "CREATE TABLE " + TABLE_OWNER + " ("
-                + OWNER_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + OWNER_NIC_COL + " INTEGER, "
-                + "FOREIGN KEY(" + OWNER_NIC_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "))";
-        db.execSQL(createOwnerTable);
+
     }
 
 
     // this method is use to add new course to our sqlite database.
-    public void regNewUser(String nicUser,String userName, String userDOB, String userEmail, String password, String profileImgPath ) {
+    public void regNewUser(String nicUser,String userName, String userDOB, String userEmail, String password, String profileImgPath, String userType ) {
 
         // on below line we are creating a variable for
         // our sqlite database and calling writable method
@@ -77,6 +73,7 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(USER_EMAIL_COL, userEmail);
         values.put(PROFILE_IMG_COL, profileImgPath);
         values.put(PASSWORD_COL, password);
+        values.put(USER_TYPE_COL, userType);
 
 
 
@@ -102,7 +99,6 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // this method is called to check if the table exists already.
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_OWNER);
         onCreate(db);
     }
 
