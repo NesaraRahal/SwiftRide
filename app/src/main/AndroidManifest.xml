@@ -31,6 +31,7 @@
         <activity android:name=".DashboardActivity" />
         <activity android:name=".OwnerDashboardActivity" />
         <activity android:name=".DriverDashboardActivity" />
+        <activity android:name=".BusRegisterActivity" />
 
     </application>
 

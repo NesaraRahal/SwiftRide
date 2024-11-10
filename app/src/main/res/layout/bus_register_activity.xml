@@ -12,7 +12,15 @@
         android:text="Add Your Bus"
         android:textSize="24sp"
         android:gravity="center"
+        android:layout_marginBottom="50px"
         android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Bus Details"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/routeNo"
@@ -39,66 +47,24 @@
         android:layout_height="wrap_content"
         android:hint="Number of seats" />
 
-    <EditText
-        android:id="@+id/userNICRegister"
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Select Driver"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+
+
+    <Spinner
+        android:id="@+id/driverEmailRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="NIC" />
 
-    <EditText
-        android:id="@+id/dobRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="DD/MM/YY" />
 
-    <EditText
-        android:id="@+id/emailRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Email" />
 
-    <Spinner
-        android:id="@+id/userType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:entries="@array/user_type"/>
-
-    <EditText
-        android:id="@+id/registerPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword" />
-
-    <EditText
-        android:id="@+id/registerConfirmPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Confirm Password"
-        android:inputType="textPassword" />
-
-    <!-- Profile Image View -->
-    <ImageView
-        android:id="@+id/profileImageView"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_gravity="center_horizontal"
-        android:onClick="selectProfileImage"
-        android:src="@drawable/ic_default_profile"
-        android:contentDescription="Profile Image"
-        android:scaleType="centerCrop"
-        android:clickable="true"
-        android:focusable="true"
-        />
-
-    <Button
-        android:id="@+id/selectImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Profile Image"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:onClick="selectProfileImage" />
 
 
     <Button

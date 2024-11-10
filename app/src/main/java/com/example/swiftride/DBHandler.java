@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DBHandler extends SQLiteOpenHelper {
     // creating a constant variables for our database.
     // below variable is for our database name.
@@ -114,6 +117,40 @@ public class DBHandler extends SQLiteOpenHelper {
         cursor.close();
         return userType;
     }
+
+    public List<String> getDriverNic() {
+        List<String> driverNic = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to select USER_ID_COL where USER_TYPE_COL is "Bus Driver"
+        Cursor cursor = db.rawQuery("SELECT " + USER_ID_COL + " FROM " + TABLE_USER + " WHERE " + USER_TYPE_COL + " = ?", new String[]{"Bus Driver"});
+
+        // Check if the cursor contains the expected column
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Verify if USER_ID_COL exists in the cursor's column names
+                int columnIndex = cursor.getColumnIndex(USER_ID_COL);
+                if (columnIndex != -1) {
+                    // Retrieve the NIC value from USER_ID_COL
+                    String nicValue = cursor.getString(columnIndex);
+                    driverNic.add(nicValue);
+                } else {
+                    Log.e("DBHandler", "Column '" + USER_ID_COL + "' not found in cursor.");
+                }
+            } while (cursor.moveToNext());
+        } else {
+            Log.e("DBHandler", "Cursor is empty or could not move to first row.");
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return driverNic;
+    }
+
+
+
 
 
 
