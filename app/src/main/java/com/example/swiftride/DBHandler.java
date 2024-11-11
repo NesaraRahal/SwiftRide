@@ -64,7 +64,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         String createBusTable = "CREATE TABLE " + TABLE_BUS + " ("
                 + BUS_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " // Auto-increment for bus ID
-                + ROUTE_NO_COL + " INTEGER UNIQUE NOT NULL, " // Unique route number
+                + ROUTE_NO_COL + " TEXT NOT NULL, " // Unique route number
                 + ROUTE_START_COL + " TEXT, " // Start route as text
                 + ROUTE_DESTINATION_COL + " TEXT, " // Destination route as text
                 + NO_SEATS_COL + " INTEGER, " // Number of seats as integer
