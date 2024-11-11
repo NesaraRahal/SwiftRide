@@ -8,4 +8,9 @@
         <item>Bus Driver</item>
         <item>Bus Owner</item>
     </string-array>
+    <string-array name="bus_type">
+        <item>AC/Luxury</item>
+        <item>Semi Luxury</item>
+        <item>Normal</item>
+    </string-array>
 </resources>

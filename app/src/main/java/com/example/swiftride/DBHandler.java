@@ -27,11 +27,18 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String USER_EMAIL_COL = "email";
     private static final String PROFILE_IMG_COL = "profile_img_path";
     private static final String PASSWORD_COL = "password";
-
     private static final String USER_TYPE_COL = "userType";
 
 
-
+    //Register Bus Table
+    private static final String TABLE_BUS = "bus";
+    private static final String BUS_ID_COL = "bus_id";
+    private static final String ROUTE_NO_COL = "routeNo";
+    private static final String ROUTE_START_COL = "startRoute";
+    private static final String ROUTE_DESTINATION_COL = "destinationRoute";
+    private static final String NO_SEATS_COL = "noSeats";
+    private static final String OWNER_ID_COL = "ownerId";
+    private static final String DRIVER_ID_COL = "driverId";
 
 
 
@@ -55,7 +62,20 @@ public class DBHandler extends SQLiteOpenHelper {
         // method to execute above sql query
         db.execSQL(createUserTable);
 
+        String createBusTable = "CREATE TABLE " + TABLE_BUS + " ("
+                + BUS_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " // Auto-increment for bus ID
+                + ROUTE_NO_COL + " INTEGER UNIQUE NOT NULL, " // Unique route number
+                + ROUTE_START_COL + " TEXT, " // Start route as text
+                + ROUTE_DESTINATION_COL + " TEXT, " // Destination route as text
+                + NO_SEATS_COL + " INTEGER, " // Number of seats as integer
+                + OWNER_ID_COL + " INTEGER, " // Owner ID as integer
+                + DRIVER_ID_COL + " INTEGER, " // Driver ID as integer
+                + "FOREIGN KEY (" + OWNER_ID_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " // Foreign key for owner ID
+                + "FOREIGN KEY (" + DRIVER_ID_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + ") " // Foreign key for driver ID
+                + ")";
 
+// Execute the SQL query to create the table
+        db.execSQL(createBusTable);
     }
 
 
