@@ -33,6 +33,7 @@ public class DBHandler extends SQLiteOpenHelper {
     //Register Bus Table
     private static final String TABLE_BUS = "bus";
     private static final String BUS_ID_COL = "bus_id";
+    private static final String BUS_LICENSE_PLATE_COL = "license_no";
     private static final String ROUTE_NO_COL = "routeNo";
     private static final String ROUTE_START_COL = "startRoute";
     private static final String ROUTE_DESTINATION_COL = "destinationRoute";
@@ -64,6 +65,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
         String createBusTable = "CREATE TABLE " + TABLE_BUS + " ("
                 + BUS_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " // Auto-increment for bus ID
+                + BUS_LICENSE_PLATE_COL + " TEXT NOT NULL, " // Unique route number
                 + ROUTE_NO_COL + " TEXT NOT NULL, " // Unique route number
                 + ROUTE_START_COL + " TEXT, " // Start route as text
                 + ROUTE_DESTINATION_COL + " TEXT, " // Destination route as text
@@ -104,6 +106,57 @@ public class DBHandler extends SQLiteOpenHelper {
 
         return result;
     }
+
+    public long regBus(Context context, String licenseNo, String routeNO, String routeStart, String routeDestination, String noSeats, int  ownerId, int driverId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(BUS_LICENSE_PLATE_COL, licenseNo);
+        values.put(ROUTE_NO_COL, routeNO);
+        values.put(ROUTE_START_COL, routeStart);
+        values.put(ROUTE_DESTINATION_COL, routeDestination);
+        values.put(NO_SEATS_COL, noSeats);
+        values.put(OWNER_ID_COL, ownerId);
+        values.put(DRIVER_ID_COL, driverId);
+
+
+        // Attempt to insert and return the result
+        long result = db.insert(TABLE_BUS, null, values);
+        db.close();
+
+        // Show success message only if successful
+        if (result != -1) {
+            Toast.makeText(context, "User registered successfully!", Toast.LENGTH_SHORT).show();
+        }
+
+        return result;
+    }
+
+    // Get owner email
+    public int getOwnerIdByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int ownerId = -1; // Default value if not found
+
+        // Execute query to find the user ID based on email
+        Cursor cursor = db.rawQuery(
+                "SELECT " + USER_ID_COL + " FROM " + TABLE_USER + " WHERE " + USER_EMAIL_COL + " = ?",
+                new String[]{email}
+        );
+
+        // Check if the USER_ID_COL exists and cursor has results
+        int columnIndex = cursor.getColumnIndex(USER_ID_COL);
+        if (columnIndex != -1 && cursor.moveToFirst()) {
+            ownerId = cursor.getInt(columnIndex);
+        } else {
+            Log.e("DBHandler", "Column '" + USER_ID_COL + "' not found or no results for email: " + email);
+        }
+
+        cursor.close();
+        db.close();
+        return ownerId;
+    }
+
+
 
     public boolean isValid(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();

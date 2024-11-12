@@ -32,6 +32,8 @@ public class RegisterActivity extends Activity {
     private ImageView profileImageView;
     private Uri selectedImageUri; // To store the selected image URI
 
+    public static String userEmail;
+
 
 
     @Override
@@ -109,7 +111,7 @@ public class RegisterActivity extends Activity {
         String userDob = dobEdt.getText().toString();
 
         EditText emailEdt = findViewById(R.id.emailRegister);
-        String userEmail = emailEdt.getText().toString();
+        userEmail = emailEdt.getText().toString();
 
         EditText pwEdt = findViewById(R.id.registerPassword);
         String password = pwEdt.getText().toString().trim();

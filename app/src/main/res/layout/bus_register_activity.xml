@@ -23,6 +23,12 @@
         android:textSize="20sp" />
 
     <EditText
+        android:id="@+id/licenceNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="License Number - Eg: NC-0979" />
+
+    <EditText
         android:id="@+id/routeNo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -47,11 +53,7 @@
         android:layout_height="wrap_content"
         android:hint="Number of seats" />
 
-    <Spinner
-        android:id="@+id/busTypeRegister"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:entries="@array/bus_type"/>
+
 
     <TextView
         android:layout_width="142dp"
@@ -62,12 +64,25 @@
         android:textSize="20sp" />
 
 
-
     <Spinner
         android:id="@+id/driverEmailRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="NIC" />
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Verification"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/ownerVerificationRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Your Email" />
 
 
 

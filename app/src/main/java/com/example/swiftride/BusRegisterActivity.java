@@ -1,5 +1,7 @@
 package com.example.swiftride;
 
+import static com.example.swiftride.RegisterActivity.userEmail;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -44,6 +46,10 @@ public class BusRegisterActivity extends Activity {
     }
 
     public void regBus(View view) {
+
+            EditText licenseNoedt = findViewById(R.id.licenceNo);
+            String licenseNo = licenseNoedt.getText().toString();
+
             EditText routeNoEdt = findViewById(R.id.routeNo);
             String routeNo = routeNoEdt.getText().toString();
 
@@ -56,11 +62,39 @@ public class BusRegisterActivity extends Activity {
             EditText seatNumberEdt = findViewById(R.id.seatNumberRegister);
             String seatNumber = seatNumberEdt.getText().toString();
 
-            Spinner busTypeSpinner = findViewById(R.id.busTypeRegister);
-            String busType = busTypeSpinner.getSelectedItem().toString();
 
         // Use selectedDriverNic, which holds the selected driver NIC from the spinner
             String selectedDriver = selectedDriverNic;
+            int selectDriverId = Integer.parseInt(selectedDriver);
+
             Toast.makeText(this, "selectedDriver"+ selectedDriver, Toast.LENGTH_SHORT).show();
+
+            EditText ownerVerificationEdt = findViewById(R.id.ownerVerificationRegister);
+            String ownerVerification = ownerVerificationEdt.getText().toString();
+
+            if(ownerVerification.equals(userEmail)){
+                // Write a query to retiveve owner id using email
+                DBHandler dbHandler = new DBHandler(this);
+
+                // Retrieve owner ID using email
+                int ownerId = dbHandler.getOwnerIdByEmail(userEmail);
+
+                if(routeNo.isEmpty() || routeStart.isEmpty() || routeDestination.isEmpty() || seatNumber.isEmpty() ){
+                    Toast.makeText(this, "Please fill the above fields", Toast.LENGTH_SHORT).show();
+                }
+
+                DBHandler dbHandlerRegBus = new DBHandler(this);
+                long result = dbHandlerRegBus.regBus(this, licenseNo, routeNo, routeStart, routeDestination, seatNumber, ownerId, selectDriverId);
+                if (result != -1) {
+                    Toast.makeText(this, "Bus registered successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Bus registration failed", Toast.LENGTH_SHORT).show();
+                }
+            }else{
+                Toast.makeText(this, "Invalid email for verification", Toast.LENGTH_SHORT).show();
+            }
+
+
+
     }
 }
