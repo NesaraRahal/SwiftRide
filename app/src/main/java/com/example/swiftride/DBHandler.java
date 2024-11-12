@@ -17,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 6;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -107,7 +107,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public long regBus(Context context, String licenseNo, String routeNO, String routeStart, String routeDestination, String noSeats, int  ownerId, int driverId) {
+    public long regBus(Context context, String licenseNo, String routeNO, String routeStart, String routeDestination, int noSeats, int  ownerId, int driverId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -231,6 +231,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // this method is called to check if the table exists already.
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUS);  // Add this line
         onCreate(db);
     }
 

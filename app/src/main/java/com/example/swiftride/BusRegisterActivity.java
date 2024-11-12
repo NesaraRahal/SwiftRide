@@ -1,5 +1,6 @@
 package com.example.swiftride;
 
+import static com.example.swiftride.MainActivity.loginMail;
 import static com.example.swiftride.RegisterActivity.userEmail;
 
 import android.app.Activity;
@@ -62,6 +63,8 @@ public class BusRegisterActivity extends Activity {
             EditText seatNumberEdt = findViewById(R.id.seatNumberRegister);
             String seatNumber = seatNumberEdt.getText().toString();
 
+            int seatNo = Integer.parseInt(seatNumber);
+
 
         // Use selectedDriverNic, which holds the selected driver NIC from the spinner
             String selectedDriver = selectedDriverNic;
@@ -71,20 +74,21 @@ public class BusRegisterActivity extends Activity {
 
             EditText ownerVerificationEdt = findViewById(R.id.ownerVerificationRegister);
             String ownerVerification = ownerVerificationEdt.getText().toString();
+            Toast.makeText(this, "user email"+ loginMail, Toast.LENGTH_SHORT).show();
 
-            if(ownerVerification.equals(userEmail)){
+        if(ownerVerification.equals(loginMail)){
                 // Write a query to retiveve owner id using email
                 DBHandler dbHandler = new DBHandler(this);
 
                 // Retrieve owner ID using email
-                int ownerId = dbHandler.getOwnerIdByEmail(userEmail);
+                int ownerId = dbHandler.getOwnerIdByEmail(loginMail);
 
                 if(routeNo.isEmpty() || routeStart.isEmpty() || routeDestination.isEmpty() || seatNumber.isEmpty() ){
                     Toast.makeText(this, "Please fill the above fields", Toast.LENGTH_SHORT).show();
                 }
 
                 DBHandler dbHandlerRegBus = new DBHandler(this);
-                long result = dbHandlerRegBus.regBus(this, licenseNo, routeNo, routeStart, routeDestination, seatNumber, ownerId, selectDriverId);
+                long result = dbHandlerRegBus.regBus(this, licenseNo, routeNo, routeStart, routeDestination, seatNo, ownerId, selectDriverId);
                 if (result != -1) {
                     Toast.makeText(this, "Bus registered successfully!", Toast.LENGTH_SHORT).show();
                 } else {

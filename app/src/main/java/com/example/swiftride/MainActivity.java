@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
+    public  static String loginMail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,7 +25,7 @@ public class MainActivity extends Activity {
 
     public void logUser(View view){
         EditText emailLoginEdt = findViewById(R.id.emailInput);
-        String loginMail = emailLoginEdt.getText().toString().trim();
+        loginMail = emailLoginEdt.getText().toString().trim();
 
         EditText passwordLoginEdt = findViewById(R.id.passwordInput);
         String loginPassword = passwordLoginEdt.getText().toString().trim();
