@@ -3,39 +3,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:id="@+id/linerLayout">
+
+    <!-- Additional Views can go inside this RelativeLayout -->
+
+    <ImageView
+        android:id="@+id/busImg"
+        android:layout_width="292dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center_horizontal"
+        android:clickable="true"
+        android:contentDescription="Become a owner"
+        android:focusable="true"
+        android:onClick="regOwner"
+        android:scaleType="centerCrop"
+        android:src="@drawable/modern_bus" />
+
 
     <!-- Inner RelativeLayout within LinearLayout -->
+
+    <TextView
+        android:id="@+id/textOwner"
+        android:layout_width="147dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/busImg"
+        android:layout_marginLeft="100px"
+        android:layout_marginTop="10px"
+        android:layout_marginEnd="-185dp"
+        android:text="Dashboard"
+        android:textSize="19sp" />
+
     <RelativeLayout
+        android:layout_marginTop="100px"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Additional Views can go inside this RelativeLayout -->
-
-        <ImageView
-            android:id="@+id/busImg"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_horizontal"
-            android:clickable="true"
-            android:contentDescription="Become a owner"
-            android:focusable="true"
-            android:onClick="regOwner"
-            android:scaleType="centerCrop"
-            android:src="@drawable/modern_bus" />
-
-        <TextView
-            android:id="@+id/textOwner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/busImg"
-            android:layout_marginLeft="100px"
-            android:layout_marginTop="150px"
-            android:layout_marginEnd="-185dp"
-            android:text="Dashboard"
-            android:textSize="19sp" />
-
-
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewBuses"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp" />
 
     </RelativeLayout>
 

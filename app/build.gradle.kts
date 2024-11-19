@@ -40,4 +40,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    implementation(libs.recyclerview)  // Correctly points to version catalog
+    implementation(libs.cardview)  // Ensure you have the correct reference here
+
+
 }

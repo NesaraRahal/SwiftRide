@@ -1,0 +1,31 @@
+<!-- activity_login.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="@color/white"
+    >
+
+    <TextView
+        android:id="@+id/tvLicensePlate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="License Plate"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvRoute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Route" />
+
+    <TextView
+        android:id="@+id/tvNoSeats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seats" />
+
+
+</LinearLayout>

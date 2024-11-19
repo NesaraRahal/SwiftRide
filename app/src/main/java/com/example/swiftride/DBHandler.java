@@ -132,6 +132,36 @@ public class DBHandler extends SQLiteOpenHelper {
         return result;
     }
 
+    // Returning bus details to display them in card view in frontend
+    public List<Bus> getAllBuses() {
+        List<Bus> busList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_BUS;
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Bus bus = new Bus(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(BUS_ID_COL)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(BUS_LICENSE_PLATE_COL)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(ROUTE_NO_COL)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(ROUTE_START_COL)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(ROUTE_DESTINATION_COL)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(NO_SEATS_COL)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(OWNER_ID_COL)),
+                        cursor.getInt(cursor.getColumnIndexOrThrow(DRIVER_ID_COL))
+                );
+                busList.add(bus);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return busList;
+    }
+
+
     // Get owner email
     public int getOwnerIdByEmail(String email) {
         SQLiteDatabase db = this.getReadableDatabase();

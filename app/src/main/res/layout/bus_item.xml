@@ -1,0 +1,45 @@
+<!-- res/layout/bus_item.xml -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/textLicenseNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="License Number"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textRouteNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Route Number"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/textStartDestination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start - Destination"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/textSeatsAvailable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seats Available"
+            android:textSize="14sp" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
