@@ -161,6 +161,22 @@ public class DBHandler extends SQLiteOpenHelper {
         return busList;
     }
 
+    public List<String> getDistinctCities() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> cities = new ArrayList<>();
+        String query = "SELECT DISTINCT " + ROUTE_START_COL + " FROM " + TABLE_BUS + " UNION SELECT DISTINCT " + ROUTE_DESTINATION_COL + " FROM " + TABLE_BUS;
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                cities.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return cities;
+    }
+
+
 
     // Get owner email
     public int getOwnerIdByEmail(String email) {

@@ -43,6 +43,6 @@ dependencies {
 
     implementation(libs.recyclerview)  // Correctly points to version catalog
     implementation(libs.cardview)  // Ensure you have the correct reference here
-
+    implementation(libs.osmdroid)  // Add the OSMDroid dependency here
 
 }
