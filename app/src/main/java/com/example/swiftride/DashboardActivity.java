@@ -99,6 +99,11 @@ public class DashboardActivity extends Activity {
         return cityCoordinates;
     }
 
+    public void bookBus(View view){
+        Intent intent = new Intent(this, BookBus.class);
+        startActivity(intent);
+    }
+
 }
 
 

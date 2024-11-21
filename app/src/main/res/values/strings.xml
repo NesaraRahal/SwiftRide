@@ -3,6 +3,8 @@
     <string name="owner">Owner Dashboard</string>
     <string name="reg_busBtn">Add your bus</string>
     <string name="reg_bus">Register you Bus</string>
+    <string name="book_bus">Book your bus</string>
+
     <string-array name="user_type">
         <item>Passenger</item>
         <item>Bus Driver</item>

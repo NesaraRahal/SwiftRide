@@ -178,6 +178,73 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
 
+    //Get Start point of the bus for reservation
+    public List<String> getStartPoint() {
+        List<String> startPoint = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to select USER_ID_COL where USER_TYPE_COL is "Bus Driver"
+        Cursor cursor = db.rawQuery("SELECT DISTINCT " + ROUTE_START_COL + " FROM " + TABLE_BUS, null);
+
+        // Check if the cursor contains the expected column
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Verify if USER_ID_COL exists in the cursor's column names
+                int columnIndex = cursor.getColumnIndex(ROUTE_START_COL);
+                if (columnIndex != -1) {
+                    // Retrieve the NIC value from USER_ID_COL
+                    String busStart = cursor.getString(columnIndex);
+                    startPoint.add(busStart);
+                } else {
+                    Log.e("DBHandler", "Column '" + ROUTE_START_COL + "' not found in cursor.");
+                }
+            } while (cursor.moveToNext());
+        } else {
+            Log.e("DBHandler", "Cursor is empty or could not move to first row.");
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return startPoint;
+    }
+
+    // retreiving the destination for spinners in reservation window
+
+    public List<String> getDestination() {
+        List<String> startPoint = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to select USER_ID_COL where USER_TYPE_COL is "Bus Driver"
+        Cursor cursor = db.rawQuery("SELECT DISTINCT " + ROUTE_DESTINATION_COL + " FROM " + TABLE_BUS, null);
+
+        // Check if the cursor contains the expected column
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                // Verify if USER_ID_COL exists in the cursor's column names
+                int columnIndex = cursor.getColumnIndex(ROUTE_DESTINATION_COL);
+                if (columnIndex != -1) {
+                    // Retrieve the NIC value from USER_ID_COL
+                    String busStart = cursor.getString(columnIndex);
+                    startPoint.add(busStart);
+                } else {
+                    Log.e("DBHandler", "Column '" + ROUTE_DESTINATION_COL + "' not found in cursor.");
+                }
+            } while (cursor.moveToNext());
+        } else {
+            Log.e("DBHandler", "Cursor is empty or could not move to first row.");
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return startPoint;
+    }
+
+
+
     // Get owner email
     public int getOwnerIdByEmail(String email) {
         SQLiteDatabase db = this.getReadableDatabase();

@@ -20,6 +20,16 @@
         android:scaleType="centerCrop"
         android:src="@drawable/modern_bus" />
 
+    <Button
+        android:id="@+id/bookBus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/book_bus"
+        android:onClick="bookBus"
+        />
+
 
     <!-- Inner RelativeLayout within LinearLayout -->
 
@@ -68,5 +78,7 @@
             android:paddingBottom="8dp" />
 
     </RelativeLayout>
+
+
 
 </LinearLayout>
