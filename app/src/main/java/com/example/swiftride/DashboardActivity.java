@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,10 +46,7 @@ public class DashboardActivity extends Activity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         dbHandler = new DBHandler(this);
-        List<Bus> busList = dbHandler.getAllBuses();
 
-        busAdapter = new BusAdapter(busList);
-        recyclerView.setAdapter(busAdapter);
 
         // Retrieve distinct cities from the database
         List<String> distinctCities = dbHandler.getDistinctCities();
@@ -69,6 +67,8 @@ public class DashboardActivity extends Activity {
                 // Optional: Add click behavior for the marker
                 cityMarker.setOnMarkerClickListener((marker, mapView) -> {
                     // Show additional information or perform actions
+                    displayCityInfo(marker.getTitle());
+
                     return true;
                 });
 
@@ -79,6 +79,13 @@ public class DashboardActivity extends Activity {
 
         // Refresh the map view to display markers
         mapView.invalidate();
+    }
+    private void displayCityInfo(String cityName) {
+        dbHandler = new DBHandler(this);
+        List<Bus> busList = dbHandler.getAllBuses(cityName);
+
+        busAdapter = new BusAdapter(busList);
+        recyclerView.setAdapter(busAdapter);
     }
 
     private HashMap<String, GeoPoint> getCityCoordinates() {

@@ -133,12 +133,12 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     // Returning bus details to display them in card view in frontend
-    public List<Bus> getAllBuses() {
+    public List<Bus> getAllBuses(String cityName) {
         List<Bus> busList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String query = "SELECT * FROM " + TABLE_BUS;
-        Cursor cursor = db.rawQuery(query, null);
+        String query = "SELECT * FROM " + TABLE_BUS + " WHERE " + ROUTE_START_COL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{cityName});
 
         if (cursor.moveToFirst()) {
             do {
