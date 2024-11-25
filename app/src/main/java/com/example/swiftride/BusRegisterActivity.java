@@ -63,6 +63,9 @@ public class BusRegisterActivity extends Activity {
             EditText seatNumberEdt = findViewById(R.id.seatNumberRegister);
             String seatNumber = seatNumberEdt.getText().toString();
 
+            EditText timeSlots = findViewById(R.id.timeSlotRegister);
+            String time = timeSlots.getText().toString();
+
             int seatNo = Integer.parseInt(seatNumber);
 
 
@@ -88,7 +91,7 @@ public class BusRegisterActivity extends Activity {
                 }
 
                 DBHandler dbHandlerRegBus = new DBHandler(this);
-                long result = dbHandlerRegBus.regBus(this, licenseNo, routeNo, routeStart, routeDestination, seatNo, ownerId, selectDriverId);
+                long result = dbHandlerRegBus.regBus(this, licenseNo, routeNo, routeStart, routeDestination, seatNo, time, ownerId, selectDriverId);
                 if (result != -1) {
                     Toast.makeText(this, "Bus registered successfully!", Toast.LENGTH_SHORT).show();
                 } else {

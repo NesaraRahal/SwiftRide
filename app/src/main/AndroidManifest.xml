@@ -38,6 +38,7 @@
         <activity android:name=".DriverDashboardActivity" />
         <activity android:name=".BusRegisterActivity" />
         <activity android:name=".BookBus" />
+        <activity android:name=".ReserveSeat" />
 
     </application>
 

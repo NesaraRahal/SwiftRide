@@ -45,4 +45,7 @@ dependencies {
     implementation(libs.cardview)  // Ensure you have the correct reference here
     implementation(libs.osmdroid)  // Add the OSMDroid dependency here
 
+    implementation(libs.glide)        // For image loading and caching
+    implementation(libs.lottie)       // For animations and enhanced UI/UX
+
 }

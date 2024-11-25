@@ -1,0 +1,8 @@
+<resources>
+    <!-- Define custom styles for text input -->
+    <style name="TextInputAppearance">
+        <item name="android:textColorHint">@color/primaryTextColor</item>
+        <item name="android:hint">@color/primaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+</resources>

@@ -54,6 +54,13 @@
         android:hint="Number of seats" />
 
 
+    <EditText
+        android:id="@+id/timeSlotRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Time Slot (e.g., 10:00 AM - 12:00 PM)" />
+
+
 
     <TextView
         android:layout_width="142dp"

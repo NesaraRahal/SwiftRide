@@ -17,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 6;
+    private static final int DB_VERSION = 7;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -38,6 +38,8 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String ROUTE_START_COL = "startRoute";
     private static final String ROUTE_DESTINATION_COL = "destinationRoute";
     private static final String NO_SEATS_COL = "noSeats";
+    private static final String TIME_SLOT_COL = "timeSlots";
+
     private static final String OWNER_ID_COL = "ownerId";
     private static final String DRIVER_ID_COL = "driverId";
 
@@ -70,6 +72,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 + ROUTE_START_COL + " TEXT, " // Start route as text
                 + ROUTE_DESTINATION_COL + " TEXT, " // Destination route as text
                 + NO_SEATS_COL + " INTEGER, " // Number of seats as integer
+                + TIME_SLOT_COL + " TEXT, "
                 + OWNER_ID_COL + " INTEGER, " // Owner ID as integer
                 + DRIVER_ID_COL + " INTEGER, " // Driver ID as integer
                 + "FOREIGN KEY (" + OWNER_ID_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " // Foreign key for owner ID
@@ -107,7 +110,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public long regBus(Context context, String licenseNo, String routeNO, String routeStart, String routeDestination, int noSeats, int  ownerId, int driverId) {
+    public long regBus(Context context, String licenseNo, String routeNO, String routeStart, String routeDestination, int noSeats, String timeSlots, int  ownerId, int driverId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -116,6 +119,7 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(ROUTE_START_COL, routeStart);
         values.put(ROUTE_DESTINATION_COL, routeDestination);
         values.put(NO_SEATS_COL, noSeats);
+        values.put(TIME_SLOT_COL, timeSlots);
         values.put(OWNER_ID_COL, ownerId);
         values.put(DRIVER_ID_COL, driverId);
 
@@ -175,6 +179,24 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         return cities;
     }
+
+    public List<String> getDistinctTimeSlots() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> timeSlots = new ArrayList<>();
+        String query = "SELECT DISTINCT " + TIME_SLOT_COL + " FROM " + TABLE_BUS;
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                timeSlots.add(cursor.getString(0)); // Add the time slot to the list
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return timeSlots; // Return the list of distinct time slots
+    }
+
 
 
 
@@ -242,6 +264,31 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         return startPoint;
     }
+
+    public int getNoSeats() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int noSeats = 0;
+        int busId = 4;
+
+        // Query to retrieve the number of seats for a given bus ID
+        String query = "SELECT " + NO_SEATS_COL + " FROM " + TABLE_BUS + " WHERE " + BUS_ID_COL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(busId)});
+
+        // Check if cursor has results
+        if (cursor != null && cursor.moveToFirst()) {
+            noSeats = cursor.getInt(cursor.getColumnIndexOrThrow(NO_SEATS_COL));
+        } else {
+            Log.e("DBHandler", "No seats found for bus ID: " + busId);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return noSeats;
+    }
+
 
 
 
