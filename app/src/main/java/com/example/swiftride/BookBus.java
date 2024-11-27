@@ -14,9 +14,9 @@ import java.util.List;
 
 public class BookBus extends Activity {
 
-    private String selectedStartPoint;
-    private String selectedDestinationPoint;
-    private String selectedTimeSlot; // New variable to store selected time slot
+    public static String selectedStartPoint;
+    public static String selectedDestinationPoint;
+    public static String selectedTimeSlot;
     private int noSeats;
 
     @Override
@@ -37,10 +37,6 @@ public class BookBus extends Activity {
         List<String> startPoint = dbHelper.getStartPoint();
         List<String> destinationPoint = dbHelper.getDestination();
         List<String> timeSlots = dbHelper.getDistinctTimeSlots();
-        int noSeats = dbHelper.getNoSeats();
-
-        // Update number of seats
-        noOfBusTxt.setText(String.valueOf(noSeats));
 
         // Set up start point spinner
         ArrayAdapter<String> adapterStart = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, startPoint);
@@ -51,6 +47,9 @@ public class BookBus extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 selectedStartPoint = parentView.getItemAtPosition(position).toString();
+
+                // Update seats when all selections are available
+                updateSeats(dbHelper, noOfBusTxt);
             }
 
             @Override
@@ -67,6 +66,9 @@ public class BookBus extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 selectedDestinationPoint = parentView.getItemAtPosition(position).toString();
+
+                // Update seats when all selections are available
+                updateSeats(dbHelper, noOfBusTxt);
             }
 
             @Override
@@ -83,14 +85,29 @@ public class BookBus extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 selectedTimeSlot = parentView.getItemAtPosition(position).toString();
-                // Optional: Show a toast message for the selected time slot
-                Toast.makeText(BookBus.this, "Selected Time Slot: " + selectedTimeSlot, Toast.LENGTH_SHORT).show();
+
+                // Update seats when all selections are available
+                updateSeats(dbHelper, noOfBusTxt);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
             }
         });
+    }
+
+    private void updateSeats(DBHandler dbHelper, TextView noOfBusTxt) {
+        // Ensure all selected values are available
+        if (selectedStartPoint != null && selectedDestinationPoint != null && selectedTimeSlot != null) {
+            // Directly call getNoSeats with selected parameters
+            int noSeats = dbHelper.getNoSeats(selectedStartPoint, selectedDestinationPoint, selectedTimeSlot);
+
+            // Update the TextView with the number of seats
+            noOfBusTxt.setText(String.valueOf(noSeats));
+        } else {
+            // Set a default message if selections are incomplete
+            noOfBusTxt.setText("Please select all options");
+        }
     }
 
     public void reserveSeat(View view) {

@@ -17,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 7;
+    private static final int DB_VERSION = 10;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -42,6 +42,22 @@ public class DBHandler extends SQLiteOpenHelper {
 
     private static final String OWNER_ID_COL = "ownerId";
     private static final String DRIVER_ID_COL = "driverId";
+
+    // Table name
+    private static final String TABLE_RESERVATION = "reservation";
+
+    // Column names
+    private static final String RESERVATION_ID_COL = "reservation_id"; // Primary key for the reservation table
+    private static final String RESERVATION_DATE_COL = "reservation_date"; // Date and time of the reservation
+    private static final String BUS_ID_COL_Reservation = "bus_id"; // Foreign key referencing the bus table
+    private static final String PASSENGER_ID_COL = "passenger_id"; // Foreign key referencing the user table for passengers
+    private static final String DRIVER_ID_COL_Reservation = "driver_id"; // Foreign key referencing the user table for drivers
+    private static final String OWNER_ID_COL_Reservation = "owner_id"; // Foreign key referencing the user table for drivers
+
+    private static final String START_POINT_COL = "start_point"; // Starting point of the trip
+    private static final String DESTINATION_POINT_COL = "destination_point"; // Destination point of the trip
+    private static final String SEAT_NUMBER_COL = "seat_number"; // Reserved seat number
+
 
 
 
@@ -81,6 +97,28 @@ public class DBHandler extends SQLiteOpenHelper {
 
 // Execute the SQL query to create the table
         db.execSQL(createBusTable);
+
+        String createReservationTable = "CREATE TABLE " + TABLE_RESERVATION + " (" +
+                RESERVATION_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " + // Auto-increment for reservation ID
+                RESERVATION_DATE_COL + " DATETIME NOT NULL, " + // Reservation date and time
+                BUS_ID_COL_Reservation + " INTEGER NOT NULL, " + // Foreign key to Bus table
+                PASSENGER_ID_COL + " INTEGER NOT NULL, " + // Foreign key to User table (Passenger role)
+                DRIVER_ID_COL_Reservation + " INTEGER NOT NULL, " + // Foreign key to User table (Driver role)
+                OWNER_ID_COL_Reservation + " INTEGER NOT NULL, " + // Foreign key to User table (Owner role)
+                START_POINT_COL + " TEXT NOT NULL, " + // Starting point of the route
+                DESTINATION_POINT_COL + " TEXT NOT NULL, " + // Destination point of the route
+                SEAT_NUMBER_COL + " INTEGER NOT NULL, " + // Seat number being reserved
+                "FOREIGN KEY (" + BUS_ID_COL_Reservation + ") REFERENCES " + TABLE_BUS + "(" + BUS_ID_COL + "), " + // Foreign key for bus ID
+                "FOREIGN KEY (" + PASSENGER_ID_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " + // Foreign key for passenger ID
+                "FOREIGN KEY (" + DRIVER_ID_COL_Reservation + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " + // Foreign key for driver ID
+                "FOREIGN KEY (" + OWNER_ID_COL_Reservation + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " + // Foreign key for owner ID
+                "UNIQUE (" + BUS_ID_COL_Reservation + ", " + SEAT_NUMBER_COL + ", " + RESERVATION_DATE_COL + ")" + // Prevent duplicate bookings
+                ");";
+
+
+// Execute the SQL query to create the table
+        db.execSQL(createReservationTable);
+
     }
 
 
@@ -135,6 +173,37 @@ public class DBHandler extends SQLiteOpenHelper {
 
         return result;
     }
+
+    public long reserveSeat(Context context, String reserveDate, int busId, int passengerId, int driverId, int ownerId, String start, String destination, int seatNo) {
+        SQLiteDatabase db = this.getWritableDatabase(); // Get writable database
+        ContentValues values = new ContentValues(); // Prepare content values for insertion
+
+        // Insert reservation data into ContentValues
+        values.put(RESERVATION_DATE_COL, reserveDate); // Reservation date
+        values.put(BUS_ID_COL_Reservation, busId); // Bus ID
+        values.put(PASSENGER_ID_COL, passengerId); // Passenger ID
+        values.put(DRIVER_ID_COL_Reservation, driverId); // Driver ID
+        values.put(OWNER_ID_COL_Reservation, ownerId); // Owner ID
+        values.put(START_POINT_COL, start); // Start point
+        values.put(DESTINATION_POINT_COL, destination); // Destination point
+        values.put(SEAT_NUMBER_COL, seatNo); // Seat number
+
+        // Attempt to insert and return the result
+        long result = db.insert(TABLE_RESERVATION, null, values);
+
+        // Close the database connection
+        db.close();
+
+        // Show success message only if the insertion is successful
+        if (result != -1) {
+            Toast.makeText(context, "Reservation made successfully!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Reservation failed", Toast.LENGTH_SHORT).show();
+        }
+
+        return result; // Return the row ID of the inserted reservation (or -1 if failed)
+    }
+
 
     // Returning bus details to display them in card view in frontend
     public List<Bus> getAllBuses(String cityName) {
@@ -265,22 +334,27 @@ public class DBHandler extends SQLiteOpenHelper {
         return startPoint;
     }
 
-    public int getNoSeats() {
+    public int getNoSeats(String startPoint, String destinationPoint, String timeSlot) {
         SQLiteDatabase db = this.getReadableDatabase();
         int noSeats = 0;
-        int busId = 4;
 
-        // Query to retrieve the number of seats for a given bus ID
-        String query = "SELECT " + NO_SEATS_COL + " FROM " + TABLE_BUS + " WHERE " + BUS_ID_COL + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(busId)});
+        // Query to retrieve the number of seats based on the selected start point, destination, and time slot
+        String query = "SELECT " + NO_SEATS_COL + " FROM " + TABLE_BUS + " WHERE "
+                + ROUTE_START_COL + " = ? AND "
+                + ROUTE_DESTINATION_COL + " = ? AND "
+                + TIME_SLOT_COL + " = ?";
 
-        // Check if cursor has results
+        // Execute the query with the provided parameters
+        Cursor cursor = db.rawQuery(query, new String[]{startPoint, destinationPoint, timeSlot});
+
+        // Check if the cursor has results
         if (cursor != null && cursor.moveToFirst()) {
             noSeats = cursor.getInt(cursor.getColumnIndexOrThrow(NO_SEATS_COL));
         } else {
-            Log.e("DBHandler", "No seats found for bus ID: " + busId);
+            Log.e("DBHandler", "No results found for the provided parameters.");
         }
 
+        // Close the cursor and database connection
         if (cursor != null) {
             cursor.close();
         }
@@ -288,6 +362,131 @@ public class DBHandler extends SQLiteOpenHelper {
 
         return noSeats;
     }
+
+    public int getDriverId(String startPoint, String destinationPoint, String timeSlot) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int driverId = 0;
+
+        // Query to retrieve the driver ID based on the selected start point, destination, and time slot
+        String query = "SELECT " + DRIVER_ID_COL + " FROM " + TABLE_BUS + " WHERE "
+                + ROUTE_START_COL + " = ? AND "
+                + ROUTE_DESTINATION_COL + " = ? AND "
+                + TIME_SLOT_COL + " = ?";
+
+        // Execute the query with the provided parameters
+        Cursor cursor = db.rawQuery(query, new String[]{startPoint, destinationPoint, timeSlot});
+
+        // Check if the cursor has results
+        if (cursor != null && cursor.moveToFirst()) {
+            driverId = cursor.getInt(cursor.getColumnIndexOrThrow(DRIVER_ID_COL));
+            Log.e("DBHandler", "Driver ID:" + driverId);
+
+        } else {
+            Log.e("DBHandler", "No results found for the provided parameters.");
+        }
+
+        // Close the cursor and database connection
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return driverId;
+    }
+
+    public int getOwnerId(String startPoint, String destinationPoint, String timeSlot) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int ownerId = 0;
+
+        // Query to retrieve the driver ID based on the selected start point, destination, and time slot
+        String query = "SELECT " + OWNER_ID_COL + " FROM " + TABLE_BUS + " WHERE "
+                + ROUTE_START_COL + " = ? AND "
+                + ROUTE_DESTINATION_COL + " = ? AND "
+                + TIME_SLOT_COL + " = ?";
+
+        // Execute the query with the provided parameters
+        Cursor cursor = db.rawQuery(query, new String[]{startPoint, destinationPoint, timeSlot});
+
+        // Check if the cursor has results
+        if (cursor != null && cursor.moveToFirst()) {
+            ownerId = cursor.getInt(cursor.getColumnIndexOrThrow(OWNER_ID_COL));
+            Log.e("DBHandler", "Owner ID:" + ownerId);
+
+        } else {
+            Log.e("DBHandler", "No results found for the provided parameters.");
+        }
+
+        // Close the cursor and database connection
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return ownerId;
+    }
+
+    public int getBusId(String startPoint, String destinationPoint, String timeSlot) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int busId = 0;
+
+        // Query to retrieve the driver ID based on the selected start point, destination, and time slot
+        String query = "SELECT " + BUS_ID_COL + " FROM " + TABLE_BUS + " WHERE "
+                + ROUTE_START_COL + " = ? AND "
+                + ROUTE_DESTINATION_COL + " = ? AND "
+                + TIME_SLOT_COL + " = ?";
+
+        // Execute the query with the provided parameters
+        Cursor cursor = db.rawQuery(query, new String[]{startPoint, destinationPoint, timeSlot});
+
+        // Check if the cursor has results
+        if (cursor != null && cursor.moveToFirst()) {
+            busId = cursor.getInt(cursor.getColumnIndexOrThrow(BUS_ID_COL));
+            Log.e("DBHandler", "Bus ID:" + busId);
+
+        } else {
+            Log.e("DBHandler", "No results found for the provided parameters.");
+        }
+
+        // Close the cursor and database connection
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return busId;
+    }
+
+
+    public int getUserNic(String loginMail) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int nic = 0;
+
+        // Query to retrieve the user ID (NIC) based on the email
+        String query = "SELECT " + USER_ID_COL + " FROM " + TABLE_USER + " WHERE "
+                + USER_EMAIL_COL + " = ?"; // Corrected missing closing quote
+
+        // Execute the query with the provided parameter
+        Cursor cursor = db.rawQuery(query, new String[]{loginMail});
+
+        // Check if the cursor has results
+        if (cursor != null && cursor.moveToFirst()) {
+            nic = cursor.getInt(cursor.getColumnIndexOrThrow(USER_ID_COL));
+            Log.e("DBHandler", "Userid: " + nic);
+
+        } else {
+            Log.e("DBHandler", "No results found for the provided parameters.");
+        }
+
+        // Close the cursor and database connection
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return nic;
+    }
+
+
 
 
 
@@ -391,6 +590,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // this method is called to check if the table exists already.
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_RESERVATION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUS);  // Add this line
         onCreate(db);
     }
