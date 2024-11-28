@@ -621,6 +621,40 @@ public class DBHandler extends SQLiteOpenHelper {
         return bookedSeats;
     }
 
+    // Get a list of bookings made by the user
+    public List<String> getBookingsByUser(int userNic) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> bookings = new ArrayList<>();
+        String query = "SELECT * FROM " + TABLE_RESERVATION + " WHERE " + PASSENGER_ID_COL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userNic)});
+
+        if (cursor != null) {
+            // Ensure the column indices are valid
+            int seatNumberColIndex = cursor.getColumnIndex(SEAT_NUMBER_COL);
+            int startPointColIndex = cursor.getColumnIndex(START_POINT_COL);
+            int destinationColIndex = cursor.getColumnIndex(DESTINATION_POINT_COL);
+            int timeSlotColIndex = cursor.getColumnIndex(TIME_COL);
+
+            // Check if any of the column indices are invalid (-1)
+            if (seatNumberColIndex == -1 || startPointColIndex == -1 || destinationColIndex == -1 || timeSlotColIndex == -1) {
+                Log.e("DBHandler", "One or more column names are incorrect.");
+            } else {
+                // Proceed with extracting the data
+                while (cursor.moveToNext()) {
+                    int seatNumber = cursor.getInt(seatNumberColIndex);
+                    String startPoint = cursor.getString(startPointColIndex);
+                    String destination = cursor.getString(destinationColIndex);
+                    String timeSlot = cursor.getString(timeSlotColIndex);
+                    bookings.add("Seat " + seatNumber + ", From " + startPoint + " to " + destination + ", Time: " + timeSlot);
+                }
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return bookings;
+    }
+
     public boolean isSeatBookedByUser(int seatNo, int userNic) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT COUNT(*) FROM " + TABLE_RESERVATION +
@@ -634,6 +668,9 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         return isBooked;
     }
+
+
+
 
     public void cancelSeatBooking(int seatNo, int userNic) {
         SQLiteDatabase db = this.getWritableDatabase();

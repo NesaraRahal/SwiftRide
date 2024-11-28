@@ -41,6 +41,8 @@
         <activity android:name=".BusRegisterActivity" />
         <activity android:name=".BookBus" />
         <activity android:name=".ReserveSeat" />
+        <activity android:name=".MyBookings" />
+
 
     </application>
 

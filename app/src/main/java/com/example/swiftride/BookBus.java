@@ -119,4 +119,9 @@ public class BookBus extends Activity {
         intent.putExtra("noSeats", noSeats);
         startActivity(intent);
     }
+
+    public void myBooks(View view){
+        Intent intent = new Intent(this, MyBookings.class);
+        startActivity(intent);
+    }
 }
