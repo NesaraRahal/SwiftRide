@@ -12,6 +12,7 @@ cardview = "1.0.0"            # CardView for modern UI cards
 osmdroid = "6.1.13"           # OSMDroid for map handling
 glide = "4.15.1"              # Glide for image loading
 lottie = "5.2.0"              # Lottie animations for enhanced UI/UX
+javamail = "1.6.7"            # JavaMail for email handling
 
 [libraries]
 # Testing libraries
@@ -33,6 +34,10 @@ osmdroid = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "o
 # UI/UX enhancements
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
+
+# JavaMail for email handling
+javamail = { group = "com.sun.mail", name = "android-mail", version.ref = "javamail" }
+activation = { group = "com.sun.mail", name = "android-activation", version.ref = "javamail" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

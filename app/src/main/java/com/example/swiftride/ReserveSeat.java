@@ -75,6 +75,14 @@ public class ReserveSeat extends Activity {
                             int bookedSeat =  seatButton.getId();
                             Toast.makeText(ReserveSeat.this, "Seat " + bookedSeat + " Date: " + currentDateAndTime +" booked successfully!", Toast.LENGTH_SHORT).show();
                             insertReserve(currentDateAndTime, busId, userNic, driverId, ownerId, selectedStartPoint, selectedDestinationPoint, bookedSeat);
+
+
+                            String subject = "Bus Reservation Confirmation";
+                            String body = "Dear User,\n\nYour bus reservation has been successfully made.\n\nThank you for choosing our service!";
+
+                            EmailSender emailSender = new EmailSender(loginMail, subject, body);
+                            emailSender.sendEmail();
+
                             // Update the seat's color to indicate it is now booked
                             seatButton.setBackgroundColor(Color.RED);
                             seatButton.setEnabled(false); // Disable the button
@@ -109,8 +117,5 @@ public class ReserveSeat extends Activity {
             Toast.makeText(this, "Reservation failed", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-
 
 }

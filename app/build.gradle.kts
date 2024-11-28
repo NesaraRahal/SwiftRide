@@ -25,14 +25,28 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    packaging {
+        resources {
+            excludes.addAll(
+                listOf(
+                    "META-INF/LICENSE.md", // Exclude LICENSE.md
+                    "META-INF/LICENSE.txt", // Exclude LICENSE.txt
+                    "META-INF/NOTICE.md", // Exclude NOTICE.md
+                    "META-INF/NOTICE.txt", // Exclude NOTICE.txt
+                    "META-INF/DEPENDENCIES" // Exclude other redundant files
+                )
+            )
+        }
+    }
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -41,11 +55,13 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation(libs.recyclerview)  // Correctly points to version catalog
-    implementation(libs.cardview)  // Ensure you have the correct reference here
-    implementation(libs.osmdroid)  // Add the OSMDroid dependency here
+    implementation(libs.recyclerview)
+    implementation(libs.cardview)
+    implementation(libs.osmdroid)
 
-    implementation(libs.glide)        // For image loading and caching
-    implementation(libs.lottie)       // For animations and enhanced UI/UX
+    implementation(libs.glide)
+    implementation(libs.lottie)
 
+    implementation(libs.javamail)
+    implementation(libs.activation)
 }
