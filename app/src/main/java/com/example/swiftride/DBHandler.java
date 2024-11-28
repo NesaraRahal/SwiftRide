@@ -17,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 10;
+    private static final int DB_VERSION = 11;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -57,6 +57,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String START_POINT_COL = "start_point"; // Starting point of the trip
     private static final String DESTINATION_POINT_COL = "destination_point"; // Destination point of the trip
     private static final String SEAT_NUMBER_COL = "seat_number"; // Reserved seat number
+    private static final String TIME_COL = "time";
 
 
 
@@ -108,6 +109,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 START_POINT_COL + " TEXT NOT NULL, " + // Starting point of the route
                 DESTINATION_POINT_COL + " TEXT NOT NULL, " + // Destination point of the route
                 SEAT_NUMBER_COL + " INTEGER NOT NULL, " + // Seat number being reserved
+                TIME_COL + " TEXT NOT NULL, " + // Starting point of the route
                 "FOREIGN KEY (" + BUS_ID_COL_Reservation + ") REFERENCES " + TABLE_BUS + "(" + BUS_ID_COL + "), " + // Foreign key for bus ID
                 "FOREIGN KEY (" + PASSENGER_ID_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " + // Foreign key for passenger ID
                 "FOREIGN KEY (" + DRIVER_ID_COL_Reservation + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " + // Foreign key for driver ID
@@ -174,7 +176,7 @@ public class DBHandler extends SQLiteOpenHelper {
         return result;
     }
 
-    public long reserveSeat(Context context, String reserveDate, int busId, int passengerId, int driverId, int ownerId, String start, String destination, int seatNo) {
+    public long reserveSeat(Context context, String reserveDate, int busId, int passengerId, int driverId, int ownerId, String start, String destination, int seatNo, String time) {
         SQLiteDatabase db = this.getWritableDatabase(); // Get writable database
         ContentValues values = new ContentValues(); // Prepare content values for insertion
 
@@ -187,6 +189,8 @@ public class DBHandler extends SQLiteOpenHelper {
         values.put(START_POINT_COL, start); // Start point
         values.put(DESTINATION_POINT_COL, destination); // Destination point
         values.put(SEAT_NUMBER_COL, seatNo); // Seat number
+        values.put(TIME_COL, time); // Seat number
+
 
         // Attempt to insert and return the result
         long result = db.insert(TABLE_RESERVATION, null, values);
@@ -581,7 +585,64 @@ public class DBHandler extends SQLiteOpenHelper {
         return driverNic;
     }
 
+    public List<Integer> getBookedSeats(String start, String destination, String timeSlot, String date) {
+        List<Integer> bookedSeats = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
 
+        // Updated query to avoid conflicts with full timestamp in RESERVATION_DATE_COL
+        String query = "SELECT " + SEAT_NUMBER_COL +
+                " FROM " + TABLE_RESERVATION +
+                " WHERE " + START_POINT_COL + " = ? AND " +
+                DESTINATION_POINT_COL + " = ? AND " +
+                TIME_COL + " = ? AND DATE(" + RESERVATION_DATE_COL + ") = ?";
+
+        // Debug logs to verify parameters
+        Log.d("DBHandler", "Query: " + query);
+        Log.d("DBHandler", "Params: start=" + start + ", destination=" + destination +
+                ", timeSlot=" + timeSlot + ", date=" + date);
+
+        Cursor cursor = db.rawQuery(query, new String[]{start, destination, timeSlot, date});
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    int seatNumber = cursor.getInt(0);
+                    bookedSeats.add(seatNumber); // Add seat number to the list
+                    Log.d("DBHandler", "Booked Seat: " + seatNumber);
+                } while (cursor.moveToNext());
+            }
+            cursor.close(); // Always close the cursor
+        } else {
+            Log.e("DBHandler", "Cursor is null! Query might have failed.");
+        }
+
+        db.close(); // Always close the database connection
+
+        return bookedSeats;
+    }
+
+    public boolean isSeatBookedByUser(int seatNo, int userNic) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM " + TABLE_RESERVATION +
+                " WHERE " + SEAT_NUMBER_COL + " = ? AND " + PASSENGER_ID_COL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(seatNo), String.valueOf(userNic)});
+        boolean isBooked = false;
+        if (cursor.moveToFirst()) {
+            isBooked = cursor.getInt(0) > 0; // Check if count > 0
+        }
+        cursor.close();
+        db.close();
+        return isBooked;
+    }
+
+    public void cancelSeatBooking(int seatNo, int userNic) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String whereClause = SEAT_NUMBER_COL + " = ? AND " + PASSENGER_ID_COL + " = ?";
+        String[] whereArgs = {String.valueOf(seatNo), String.valueOf(userNic)};
+        db.delete(TABLE_RESERVATION, whereClause, whereArgs);
+        db.close();
+        Log.e("DBHandler", "booking cancelled record deleted");
+    }
 
 
 
