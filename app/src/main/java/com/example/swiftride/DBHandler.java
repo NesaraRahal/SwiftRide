@@ -17,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 11;
+    private static final int DB_VERSION = 12;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -58,6 +58,22 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DESTINATION_POINT_COL = "destination_point"; // Destination point of the trip
     private static final String SEAT_NUMBER_COL = "seat_number"; // Reserved seat number
     private static final String TIME_COL = "time";
+
+
+    // Notification table for managing swap seats
+    private static final String TABLE_NOTIFICATION = "notification";
+
+    // Column names
+    private static final String NOTIFICATION_ID_COL = "notification_id"; // Primary key for the reservation table
+    private static final String SENDER_ID_COL = "sender"; // Date and time of the reservation
+    private static final String RECEIVER_ID_COL = "receiver"; // Foreign key referencing the bus table
+    private static final String SEAT_1_COL = "seat1"; // Foreign key referencing the user table for passengers
+    private static final String SEAT_2_COL = "seat2"; // Foreign key referencing the user table for drivers
+    private static final String BUS_ID_NOTIFICATION = "busIdNotification"; // Foreign key referencing the user table for drivers
+
+    private static final String STATUS_COL = "status"; // Starting point of the trip
+    private static final String TIME_COL_NOTIFICATION = "timeNotification"; // Destination point of the trip
+
 
 
 
@@ -120,6 +136,24 @@ public class DBHandler extends SQLiteOpenHelper {
 
 // Execute the SQL query to create the table
         db.execSQL(createReservationTable);
+
+        String createNotificationTable = "CREATE TABLE " + TABLE_NOTIFICATION + " (" +
+                NOTIFICATION_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " + // Auto-increment for notification ID
+                SENDER_ID_COL + " INTEGER NOT NULL, " + // Sender ID
+                RECEIVER_ID_COL + " INTEGER NOT NULL, " + // Receiver ID
+                SEAT_1_COL + " INTEGER NOT NULL, " + // Seat of sender
+                SEAT_2_COL + " INTEGER NOT NULL, " + // Seat of receiver
+                BUS_ID_NOTIFICATION + " INTEGER NOT NULL, " + // Bus ID
+                STATUS_COL + " TEXT NOT NULL, " + // Status of the request (pending, accepted, rejected)
+                TIME_COL_NOTIFICATION + " DATETIME DEFAULT CURRENT_TIMESTAMP, " + // Timestamp of the notification
+                "FOREIGN KEY (" + BUS_ID_NOTIFICATION + ") REFERENCES " + TABLE_BUS + "(" + BUS_ID_COL + "), " + // Foreign key for bus ID
+                "FOREIGN KEY (" + SENDER_ID_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " + // Foreign key for sender ID
+                "FOREIGN KEY (" + RECEIVER_ID_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + ")" + // Foreign key for receiver ID
+                ");";
+
+// Execute the SQL query to create the table
+        db.execSQL(createNotificationTable);
+
 
     }
 
@@ -207,6 +241,27 @@ public class DBHandler extends SQLiteOpenHelper {
 
         return result; // Return the row ID of the inserted reservation (or -1 if failed)
     }
+
+    public void createNotification(int senderId, int receiverId, int seat1, int seat2, int busId, String status, String time) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        // Add values for each column in the notification table
+        values.put(SENDER_ID_COL, senderId);       // Sender ID
+        values.put(RECEIVER_ID_COL, receiverId);   // Receiver ID
+        values.put(SEAT_1_COL, seat1);             // Seat 1
+        values.put(SEAT_2_COL, seat2);             // Seat 2
+        values.put(BUS_ID_NOTIFICATION, busId);    // Bus ID
+        values.put(STATUS_COL, status);            // Status (pending, accepted, rejected)
+        values.put(TIME_COL_NOTIFICATION, time);
+
+        // Insert the record into the notification table
+        db.insert(TABLE_NOTIFICATION, null, values);
+        Log.e("DBHandler", "Notification data entered successfully");
+        db.close(); // Close the database connection
+    }
+
+
 
 
     // Returning bus details to display them in card view in frontend
@@ -669,9 +724,6 @@ public class DBHandler extends SQLiteOpenHelper {
         return isBooked;
     }
 
-
-
-
     public void cancelSeatBooking(int seatNo, int userNic) {
         SQLiteDatabase db = this.getWritableDatabase();
         String whereClause = SEAT_NUMBER_COL + " = ? AND " + PASSENGER_ID_COL + " = ?";
@@ -680,6 +732,75 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
         Log.e("DBHandler", "booking cancelled record deleted");
     }
+
+    public int getPassengerId(int seatId, String startPoint, String destinationPoint, String timeSlot) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int passengerId = -1; // Default value indicating no result found
+
+        // Query to retrieve the passenger ID based on seat ID, start point, destination, and time slot
+        String query = "SELECT " + PASSENGER_ID_COL + " FROM " + TABLE_RESERVATION + " WHERE "
+                + SEAT_NUMBER_COL + " = ? AND "
+                + START_POINT_COL + " = ? AND "
+                + DESTINATION_POINT_COL + " = ? AND "
+                + TIME_COL + " = ?";
+
+        Cursor cursor = null;
+        try {
+            // Execute the query with the provided parameters
+            cursor = db.rawQuery(query, new String[]{String.valueOf(seatId), startPoint, destinationPoint, timeSlot});
+
+            // Fetch the result if available
+            if (cursor != null && cursor.moveToFirst()) {
+                passengerId = cursor.getInt(cursor.getColumnIndexOrThrow(PASSENGER_ID_COL));
+                Log.e("DBHandler", "Passenger ID: " + passengerId);
+            } else {
+                Log.e("DBHandler", "No results found for the provided parameters.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DBHandler", "Error while retrieving passenger ID: " + e.getMessage());
+        } finally {
+            // Close the cursor and database connection
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return passengerId;
+    }
+
+
+    public void swapSeats(Context context, int seatId1, int seatId2, int userNic1, int userNic2, int busId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            // Start a transaction to ensure data consistency
+            db.beginTransaction();
+
+            // Update seat for user 1
+            String updateSeat1 = "UPDATE " + TABLE_RESERVATION + " SET " + SEAT_NUMBER_COL + " = ? WHERE "
+                    + PASSENGER_ID_COL + " = ? AND " + BUS_ID_COL_Reservation + " = ?";
+            db.execSQL(updateSeat1, new Object[]{seatId2, userNic1, busId});
+
+            // Update seat for user 2
+            String updateSeat2 = "UPDATE " + TABLE_RESERVATION + " SET " + SEAT_NUMBER_COL + " = ? WHERE "
+                    + PASSENGER_ID_COL + " = ? AND " + BUS_ID_COL_Reservation + " = ?";
+            db.execSQL(updateSeat2, new Object[]{seatId1, userNic2, busId});
+
+            // Commit the transaction
+            db.setTransactionSuccessful();
+            Toast.makeText(context, "Seats swapped successfully!", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Failed to swap seats. Please try again.", Toast.LENGTH_SHORT).show();
+        } finally {
+            // End the transaction
+            db.endTransaction();
+        }
+    }
+
+
 
 
 
@@ -692,6 +813,5 @@ public class DBHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUS);  // Add this line
         onCreate(db);
     }
-
 
 }

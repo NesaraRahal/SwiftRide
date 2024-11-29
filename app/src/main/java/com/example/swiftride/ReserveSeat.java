@@ -6,18 +6,31 @@ import static com.example.swiftride.BookBus.selectedTimeSlot;
 import static com.example.swiftride.MainActivity.loginMail;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import androidx.core.app.NotificationCompat;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ReserveSeat extends Activity {
 
     private int totalSeats = 0; // Example seat count (can be fetched dynamically from DB)
+
+    private int seat1 = 0;
     private List<Integer> bookedSeats = new ArrayList<>(); // Dynamically fetched booked seats
 
     @Override
@@ -54,7 +67,7 @@ public class ReserveSeat extends Activity {
             // Mark the seat as booked or available
             if (bookedSeats != null && bookedSeats.contains(i)) {
                 seatButton.setBackgroundColor(Color.RED); // Booked seats in red
-                addCancelListener(seatButton, loginMail, userNic, dbHelper, busId, driverId, ownerId);
+                addSwappingListener(seatButton, loginMail, userNic, dbHelper, busId, driverId, ownerId);
             } else {
                 seatButton.setBackgroundColor(Color.GREEN); // Available seats in green
                 addBooking(seatButton, busId, userNic, driverId, ownerId, selectedStartPoint, selectedDestinationPoint);
@@ -91,6 +104,7 @@ public class ReserveSeat extends Activity {
                         // Update the seat's color to indicate it is now booked
                         seatButton.setBackgroundColor(Color.RED);
                         seatButton.setEnabled(false); // Disable the button
+                        seat1 = seatButton.getId();
                     })
                     .setNegativeButton("No", (dialog, which) -> {
                         seatButton.setBackgroundColor(Color.GREEN); // Reset seat to available
@@ -101,36 +115,43 @@ public class ReserveSeat extends Activity {
         });
     }
 
-    public void addCancelListener(Button seatButton, String loginMail, int userNic, DBHandler dbHelper, int busId, int driverId, int ownerId) {
+    public void addSwappingListener(Button seatButton, String loginMail, int userNic, DBHandler dbHelper, int busId, int driverId, int ownerId) {
         seatButton.setOnClickListener(view -> {
             new android.app.AlertDialog.Builder(ReserveSeat.this)
-                    .setTitle("Cancel Booking")
-                    .setMessage("Do you want to cancel your booking for Seat " + seatButton.getId() + "?")
+                    .setTitle("Seat Swapping")
+                    .setMessage("Do you want to swap the Seat " + seatButton.getId() + "?")
                     .setPositiveButton("Yes", (dialog, which) -> {
-                        if (dbHelper.isSeatBookedByUser(seatButton.getId(), userNic)) {
-                            dbHelper.cancelSeatBooking(seatButton.getId(), userNic);
+                        if (!dbHelper.isSeatBookedByUser(seatButton.getId(), userNic)) {
+
+                            int seatId2 = seatButton.getId();
+                            int user2 = dbHelper.getPassengerId(seatId2, selectedStartPoint, selectedDestinationPoint, selectedTimeSlot);
+
+                            String currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                            dbHelper.createNotification(userNic, user2, seat1, seatId2, busId, "Pending", currentTime);
+
+                            //dbHelper.swapSeats(this, seat1, seatId2, userNic, user2, busId);
 
                             // Send cancellation email
-                            String subject = "Booking Cancellation Confirmation";
+                            String subject = "Seat Swap Confimation";
                             String body = "Your booking for Seat " + seatButton.getId() + " has been successfully canceled.";
                             EmailSender emailSender = new EmailSender(loginMail, subject, body);
                             emailSender.sendEmail();
 
-                            // Update seat's color and enable booking
-                            seatButton.setBackgroundColor(Color.GREEN);
-                            seatButton.setEnabled(true); // Enable the button for re-booking
-                            addBooking(seatButton, busId, userNic, driverId, ownerId, selectedStartPoint, selectedDestinationPoint);
+
+
                         } else {
-                            Toast.makeText(ReserveSeat.this, "You can only cancel your own bookings.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ReserveSeat.this, "Seat Swapped successfully", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .setNegativeButton("No", (dialog, which) -> {
-                        Toast.makeText(ReserveSeat.this, "Cancellation aborted for Seat " + seatButton.getId(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ReserveSeat.this, "Swapping aborted for Seat " + seatButton.getId(), Toast.LENGTH_SHORT).show();
                     })
                     .setCancelable(false)
                     .show();
         });
     }
+
+
 
     public void insertReserve(String reserveDate, int busId, int passengerId, int driverId, int ownerId, String start, String destination, int seatNo) {
         DBHandler dbHelper = new DBHandler(this);
