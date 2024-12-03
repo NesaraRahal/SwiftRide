@@ -28,6 +28,8 @@ import java.util.Locale;
 
 public class ReserveSeat extends Activity {
 
+    public static int busId ;
+
     private int totalSeats = 0; // Example seat count (can be fetched dynamically from DB)
 
     private int seat1 = 0;
@@ -56,7 +58,7 @@ public class ReserveSeat extends Activity {
         int userNic = dbHelper.getUserNic(loginMail);
         int driverId = dbHelper.getDriverId(selectedStartPoint, selectedDestinationPoint, selectedTimeSlot);
         int ownerId = dbHelper.getOwnerId(selectedStartPoint, selectedDestinationPoint, selectedTimeSlot);
-        int busId = dbHelper.getBusId(selectedStartPoint, selectedDestinationPoint, selectedTimeSlot);
+        busId = dbHelper.getBusId(selectedStartPoint, selectedDestinationPoint, selectedTimeSlot);
 
         // Dynamically create seat buttons
         for (int i = 1; i <= totalSeats; i++) {

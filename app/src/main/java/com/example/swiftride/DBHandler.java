@@ -545,6 +545,36 @@ public class DBHandler extends SQLiteOpenHelper {
         return nic;
     }
 
+    public String getUsernameById(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String username = null;
+
+        // Query to retrieve the username based on the user ID
+        String query = "SELECT " + USER_NAME_COL + " FROM " + TABLE_USER + " WHERE "
+                + USER_ID_COL + " = ?";
+
+        // Execute the query with the provided parameter
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        // Check if the cursor has results
+        if (cursor != null && cursor.moveToFirst()) {
+            username = cursor.getString(cursor.getColumnIndexOrThrow(USER_NAME_COL));
+            Log.e("DBHandler", "Username: " + username);
+
+        } else {
+            Log.e("DBHandler", "No results found for the provided user ID.");
+        }
+
+        // Close the cursor and database connection
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+
+        return username;
+    }
+
+
 
 
 
@@ -771,7 +801,7 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
 
-    public void swapSeats(Context context, int seatId1, int seatId2, int userNic1, int userNic2, int busId) {
+    public void swapSeatss(Context context, int seatId1, int seatId2, int userNic1, int userNic2, int busId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
@@ -800,9 +830,104 @@ public class DBHandler extends SQLiteOpenHelper {
         }
     }
 
+    public void swapSeats(Context context, int seat1, int seat2, int receiverId, int senderId, int busId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Start a transaction to ensure atomicity
+        db.beginTransaction();
+        try {
+            // Step 1: Update the seat for the sender
+            swapSeatss(context, seat1,seat2, senderId, receiverId, busId);
+
+            // Step 3: Update the notification status to "Completed"
+            String updateNotificationStatusQuery = "UPDATE " + TABLE_NOTIFICATION + " " +
+                    "SET " + STATUS_COL + " = ? " +
+                    "WHERE " + SENDER_ID_COL + " = ? AND " + RECEIVER_ID_COL + " = ? AND " + BUS_ID_NOTIFICATION + " = ?";
+            db.execSQL(updateNotificationStatusQuery, new Object[]{"Completed", senderId, receiverId, busId});
+
+            Log.e("Database ", "Data updated successfully");
+
+
+            // Commit the transaction
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // End the transaction
+            db.endTransaction();
+        }
+    }
 
 
 
+    public boolean hasBookedSeat(int userId, int busId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NOTIFICATION +
+                " WHERE (" + SENDER_ID_COL + " = ? OR " + RECEIVER_ID_COL + " = ?) " +
+                " AND " + BUS_ID_NOTIFICATION + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(userId), String.valueOf(busId)});
+
+        boolean hasBooked = cursor.getCount() > 0;
+        cursor.close();
+        return hasBooked;
+    }
+
+    public List<Notification> getUserNotifications(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Notification> notifications = new ArrayList<>();
+        String query = "SELECT * FROM " + TABLE_NOTIFICATION +
+                " WHERE " + RECEIVER_ID_COL + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                // Get column indices
+                int notificationIdColIndex = cursor.getColumnIndex(NOTIFICATION_ID_COL);
+                int senderIdColIndex = cursor.getColumnIndex(SENDER_ID_COL);
+                int receiverIdColIndex = cursor.getColumnIndex(RECEIVER_ID_COL);
+                int seat1ColIndex = cursor.getColumnIndex(SEAT_1_COL);
+                int seat2ColIndex = cursor.getColumnIndex(SEAT_2_COL);
+                int statusColIndex = cursor.getColumnIndex(STATUS_COL);
+                int timeColIndex = cursor.getColumnIndex(TIME_COL_NOTIFICATION);
+                int busIdColIndex = cursor.getColumnIndex(BUS_ID_NOTIFICATION);
+
+                // Check if the columns are valid (index should not be -1)
+                if (notificationIdColIndex != -1 && senderIdColIndex != -1 && receiverIdColIndex != -1 &&
+                        seat1ColIndex != -1 && seat2ColIndex != -1 && statusColIndex != -1 &&
+                        timeColIndex != -1 && busIdColIndex != -1) {
+
+                    // If all columns are valid, retrieve the data
+                    int notificationId = cursor.getInt(notificationIdColIndex);
+                    int senderId = cursor.getInt(senderIdColIndex);
+                    int receiverId = cursor.getInt(receiverIdColIndex);
+                    int seat1 = cursor.getInt(seat1ColIndex);
+                    int seat2 = cursor.getInt(seat2ColIndex);
+                    String status = cursor.getString(statusColIndex);
+                    String time = cursor.getString(timeColIndex);
+                    int busId = cursor.getInt(busIdColIndex);
+
+                    // Add the notification to the list
+                    notifications.add(new Notification(notificationId, senderId, receiverId, seat1, seat2, status, time, busId));
+                } else {
+                    // If any column index is invalid, log an error
+                    Log.e("Database Error", "One or more columns are missing in the database schema.");
+                }
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return notifications;
+    }
+
+    /*public void updateNotificationStatus(int notificationId, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("status", status);
+
+        db.update(TABLE_NOTIFICATION, values, "NOTIFICATION_ID_COL = ?", new String[]{String.valueOf(notificationId)});
+        db.close();
+    }*/
 
 
     @Override

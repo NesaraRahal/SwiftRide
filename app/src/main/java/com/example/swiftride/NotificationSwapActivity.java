@@ -1,43 +1,132 @@
 package com.example.swiftride;
 
+import static com.example.swiftride.MainActivity.loginMail;
+import static com.example.swiftride.ReserveSeat.busId;
+
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
 public class NotificationSwapActivity extends Activity {
 
-    /*@Override
+    private RecyclerView recyclerView;
+    private int userNic; // This would be dynamically set based on the logged-in user
+    private int selectedBusId; // Assuming you are passing the selected bus ID
+    private NotificationAdapter adapter;
+    private List<Notification> notifications;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.notifications_swap);
+        setContentView(R.layout.notification_swap); // Corrected layout name
 
-
-        // Retrieve data from the intent
-        Intent intent = getIntent();
-        String action = intent.getStringExtra("action");
-        int seatId1 = intent.getIntExtra("seatId1", -1);
-        int seatId2 = intent.getIntExtra("seatId2", -1);
-        int userNic1 = intent.getIntExtra("userNic1", -1);
-        int userNic2 = intent.getIntExtra("userNic2", -1);
-        int busId = intent.getIntExtra("busId", -1);
-
+        recyclerView = findViewById(R.id.recyclerViewNotifications);
         DBHandler dbHelper = new DBHandler(this);
 
-        if (action != null && seatId1 != -1 && seatId2 != -1 && userNic1 != -1 && userNic2 != -1) {
-            if (action.equals("accept")) {
-                // Handle seat swap acceptance
-                dbHelper.swapSeats(this, seatId1, seatId2, userNic1, userNic2, busId);
-                Toast.makeText(this, "Seat swap accepted for Seat " + seatId1, Toast.LENGTH_SHORT).show();
-                finish(); // Close the activity after handling
-            } else if (action.equals("decline")) {
-                // Handle seat swap rejection
-                Toast.makeText(this, "Seat swap declined for Seat " + seatId1, Toast.LENGTH_SHORT).show();
-                finish(); // Close the activity after handling
-            }
+        // Retrieve the logged-in user's NIC from the database using their email
+        userNic = dbHelper.getUserNic(loginMail);
+        selectedBusId = busId;
+
+        // Display notifications for the user
+        displayNotifications(userNic);
+    }
+
+    public void displayNotifications(int userId) {
+        DBHandler dbHelper = new DBHandler(this);
+
+        // Check if the user has booked a seat
+        if (dbHelper.hasBookedSeat(userNic, selectedBusId)) {
+            // Get notifications for the user
+            notifications = dbHelper.getUserNotifications(userNic);
+
+            // Set up RecyclerView to display notifications
+            adapter = new NotificationAdapter(
+                    this,
+                    notifications,
+                    this::acceptSwap,
+                    this::rejectSwap
+            );
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(adapter);
         } else {
-            Toast.makeText(this, "Invalid data for seat swap.", Toast.LENGTH_SHORT).show();
-            finish(); // Close the activity
+            Toast.makeText(this, "No seat bookings found for the selected bus.", Toast.LENGTH_SHORT).show();
         }
-    }*/
+    }
+
+    // Corrected method signature to align with NotificationAdapter's callback
+    public void acceptSwap(int notificationId) {
+        DBHandler dbHelper = new DBHandler(this);
+
+        // Retrieve the seat details from the notification
+        Notification notification = findNotificationById(notificationId);
+        if (notification != null) {
+            int seat1 = notification.getSeat1();
+            int seat2 = notification.getSeat2();
+            int receiverId = notification.getReceiverId();
+            int senderId = notification.getSenderId();
+            int busId = notification.getBusId();
+
+            // Perform the seat swap in the database
+            dbHelper.swapSeats(this, seat1, seat2, receiverId, senderId, busId);
+
+            // Show confirmation
+            Toast.makeText(this, "Seat swap accepted", Toast.LENGTH_SHORT).show();
+
+            // Remove notification from the list in the adapter
+            int position = findNotificationPositionById(notificationId);
+            if (position != -1) {
+                adapter.removeNotification(position);  // Remove the notification from the list in the adapter
+            }
+
+            // Refresh the RecyclerView
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    public void rejectSwap(int notificationId) {
+        DBHandler dbHelper = new DBHandler(this);
+
+        // Update the notification status to rejected
+        // dbHelper.updateNotificationStatus(notificationId, "Rejected");
+
+        // Show confirmation
+        Toast.makeText(this, "Seat swap rejected", Toast.LENGTH_SHORT).show();
+
+        // Refresh notifications
+        refreshNotifications();
+    }
+
+    private Notification findNotificationById(int notificationId) {
+        for (Notification notification : notifications) {
+            if (notification.getNotificationId() == notificationId) {
+                return notification;
+            }
+        }
+        return null;
+    }
+
+    private int findNotificationPositionById(int notificationId) {
+        for (int i = 0; i < notifications.size(); i++) {
+            if (notifications.get(i).getNotificationId() == notificationId) {
+                return i;
+            }
+        }
+        return -1; // Return -1 if not found
+    }
+
+    private void refreshNotifications() {
+        DBHandler dbHelper = new DBHandler(this);
+
+        // Reload the notifications from the database
+        notifications.clear();
+        notifications.addAll(dbHelper.getUserNotifications(userNic));
+
+        // Notify the adapter about the data change
+        adapter.notifyDataSetChanged();
+    }
 }

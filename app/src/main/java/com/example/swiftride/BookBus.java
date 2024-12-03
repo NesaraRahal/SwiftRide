@@ -125,5 +125,11 @@ public class BookBus extends Activity {
         startActivity(intent);
     }
 
+    public void viewNotification(View view){
+        Intent intent = new Intent(this, NotificationSwapActivity.class);
+        startActivity(intent);
+    }
+
+
 
 }
