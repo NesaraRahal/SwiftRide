@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/passengerCountTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Passengers: 0"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:id="@+id/startPointTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start: -"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:id="@+id/destinationPointTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Destination: -"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="5dp" />
+
+    <TextView
+        android:id="@+id/busIdTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bus ID: -"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="5dp" />
+
+</LinearLayout>

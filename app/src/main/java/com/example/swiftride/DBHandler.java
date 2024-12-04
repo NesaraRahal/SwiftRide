@@ -1,13 +1,19 @@
 package com.example.swiftride;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +27,13 @@ public class DBHandler extends SQLiteOpenHelper {
 
     // User table
     private static final String TABLE_USER = "user";
-    private static final String USER_ID_COL = "user_id";
-    private static final String USER_NAME_COL = "name";
-    private static final String DOB_COL = "dob";
-    private static final String USER_EMAIL_COL = "email";
-    private static final String PROFILE_IMG_COL = "profile_img_path";
-    private static final String PASSWORD_COL = "password";
-    private static final String USER_TYPE_COL = "userType";
+    public static final String USER_ID_COL = "user_id";
+    public static final String USER_NAME_COL = "name";
+    public static final String DOB_COL = "dob";
+    public static final String USER_EMAIL_COL = "email";
+    public static final String PROFILE_IMG_COL = "profile_img_path";
+    public static final String PASSWORD_COL = "password";
+    public static final String USER_TYPE_COL = "userType";
 
 
     //Register Bus Table
@@ -211,6 +217,67 @@ public class DBHandler extends SQLiteOpenHelper {
 
         return result;
     }
+
+    // Method to retrieve user profile data by NIC
+
+    public Bitmap getProfileImage(Context context, String profileImgPath) {
+        if (profileImgPath.startsWith("content://")) {
+            try {
+                // Create a URI from the content path
+                Uri imageUri = Uri.parse(profileImgPath);
+
+                // Use ContentResolver to get an InputStream for the image
+                ContentResolver contentResolver = context.getContentResolver();
+                InputStream imageStream = contentResolver.openInputStream(imageUri);
+
+                // Decode the InputStream into a Bitmap
+                return BitmapFactory.decodeStream(imageStream);
+            } catch (FileNotFoundException e) {
+                Log.e("ProfileImage", "File not found: " + e.getMessage());
+                return null;
+            }
+        } else {
+            // If the path is a regular file path, decode it directly
+            return BitmapFactory.decodeFile(profileImgPath);
+        }
+    }
+    public Cursor getUserProfile(Context context, int nicUser) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to retrieve user details by NIC
+        Cursor cursor = db.query(
+                TABLE_USER,              // The table to query
+                null,                    // Columns to return (null returns all columns)
+                USER_ID_COL + " = ?",    // The WHERE clause
+                new String[]{String.valueOf(nicUser)}, // The values for the WHERE clause (nicUser as String)
+                null,                    // GROUP BY
+                null,                    // HAVING
+                null                     // ORDER BY
+        );
+
+        if (cursor != null && cursor.moveToFirst()) {
+            // Get the profile image path from the cursor
+            int profileImgColumnIndex = cursor.getColumnIndex(PROFILE_IMG_COL); // Get the index of the column
+            String profileImgPath = cursor.getString(profileImgColumnIndex); // Retrieve the value of the column
+
+            // Get the email from the cursor
+            int emailColumnIndex = cursor.getColumnIndex(USER_EMAIL_COL); // Assuming EMAIL_COL is the column name for the email
+            String email = cursor.getString(emailColumnIndex); // Retrieve the email value
+
+            // Log the profile image path and email
+            Log.d("ProfileImage", "Image path: " + profileImgPath);
+            Log.d("UserProfile", "User Email: " + email);
+        } else {
+            // Handle the case where no user is found
+            Log.d("UserProfile", "No user found with the given NIC.");
+        }
+
+        return cursor; // Return the cursor, though you should ideally close it after using it
+    }
+
+
+
+
 
     public long regBus(Context context, String licenseNo, String routeNO, String routeStart, String routeDestination, int noSeats, String timeSlots, int  ownerId, int driverId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -1082,6 +1149,65 @@ public class DBHandler extends SQLiteOpenHelper {
         return feedbackList;
     }
 
+    //Retrieve number of passengers in a turn
+    public List<ReservationInfo> getPassengerDetailsForDriver(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<ReservationInfo> reservationInfoList = new ArrayList<>();
+
+        // Query to get passenger count, start point, destination point, bus ID for the driver
+        String query = "SELECT " +
+                "COUNT(" + PASSENGER_ID_COL + ") AS passenger_count, " +
+                START_POINT_COL + ", " +
+                DESTINATION_POINT_COL + ", " +
+                BUS_ID_COL_Reservation + ", " +
+                RESERVATION_DATE_COL +
+                " FROM " + TABLE_RESERVATION +
+                " WHERE " + DRIVER_ID_COL_Reservation + " = ?" +
+                " GROUP BY " + START_POINT_COL + ", " + DESTINATION_POINT_COL + ", " + BUS_ID_COL_Reservation + ", " + RESERVATION_DATE_COL;
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                // Get column indexes
+                int passengerCountIndex = cursor.getColumnIndex("passenger_count");
+                int startPointIndex = cursor.getColumnIndex(START_POINT_COL);
+                int destinationPointIndex = cursor.getColumnIndex(DESTINATION_POINT_COL);
+                int busIdIndex = cursor.getColumnIndex(BUS_ID_COL_Reservation);
+                int reservationDateIndex = cursor.getColumnIndex(RESERVATION_DATE_COL);
+
+                // Initialize variables
+                int passengerCount = 0;
+                String startPoint = null;
+                String destinationPoint = null;
+                int busId = 0;
+                String reservationDate = null;
+
+                // Validate each index before accessing the column
+                if (passengerCountIndex != -1) {
+                    passengerCount = cursor.getInt(passengerCountIndex);
+                }
+                if (startPointIndex != -1) {
+                    startPoint = cursor.getString(startPointIndex);
+                }
+                if (destinationPointIndex != -1) {
+                    destinationPoint = cursor.getString(destinationPointIndex);
+                }
+                if (busIdIndex != -1) {
+                    busId = cursor.getInt(busIdIndex);
+                }
+                if (reservationDateIndex != -1) {
+                    reservationDate = cursor.getString(reservationDateIndex);
+                }
+
+                // Add to the list if essential data is present
+                reservationInfoList.add(new ReservationInfo(passengerCount, startPoint, destinationPoint, busId, reservationDate));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return reservationInfoList;
+    }
 
 
     @Override

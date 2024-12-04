@@ -1,6 +1,7 @@
 package com.example.swiftride;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -17,13 +19,16 @@ import android.widget.Toast;
 import android.Manifest;
 
 
+import androidx.activity.ComponentActivity;
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.IOException;
+import java.util.Calendar;
 
-public class RegisterActivity extends Activity {
+public class RegisterActivity extends ComponentActivity {
 
 
     private static final int REQUEST_IMAGE_PICK = 100;
@@ -39,8 +44,40 @@ public class RegisterActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.register_page);
         profileImageView = findViewById(R.id.profileImageView);
+
+        // Find the button and EditText in the layout
+        Button dobButton = findViewById(R.id.btn_dob);  // Button to trigger the DatePickerDialog
+        final EditText dobEditText = findViewById(R.id.dobRegister);  // EditText to display the selected date
+
+        // Set an OnClickListener for the Date of Birth button
+        dobButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the current date
+                final Calendar calendar = Calendar.getInstance();
+                int year = calendar.get(Calendar.YEAR);
+                int month = calendar.get(Calendar.MONTH);
+                int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                // Create the DatePickerDialog
+                DatePickerDialog datePickerDialog = new DatePickerDialog(
+                        RegisterActivity.this,  // Context for the dialog
+                        (view, selectedYear, selectedMonth, selectedDay) -> {
+                            // Format the selected date and display it in the EditText
+                            //String selectedDate = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
+                            String selectedDate = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
+                            dobEditText.setText(selectedDate);  // Set the selected date to the EditText
+                        },
+                        year, month, day  // Set the initial date to the current date
+                );
+
+                // Show the DatePickerDialog
+                datePickerDialog.show();
+         }
+        });
 
     }
 

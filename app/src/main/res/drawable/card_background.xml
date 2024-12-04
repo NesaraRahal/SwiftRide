@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#FFFFFF"/> <!-- Background color of the card -->
-    <corners android:radius="16dp"/> <!-- Rounded corners with 16dp radius -->
-    <elevation android:radius="2dp"/> <!-- Optional elevation for subtle shadow -->
+    <solid android:color="#FFFFFF"/> <!-- Background color of the field -->
+    <size android:height="1dp"/> <!-- Height of the field -->
+    <stroke
+        android:color="#CCCCCC"
+        android:width="1dp"/> <!-- Border width -->
+    <padding
+        android:left="0dp"
+        android:right="0dp"
+        android:top="0dp"
+        android:bottom="2dp"/> <!-- Padding to give space between the text and the border -->
 </shape>

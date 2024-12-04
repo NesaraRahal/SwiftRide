@@ -1,0 +1,108 @@
+<!-- activity_login.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Your Bus"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:layout_marginBottom="50px"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Bus Details"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/licenceNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="License Number - Eg: NC-0979" />
+
+    <EditText
+        android:id="@+id/routeNo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Route Number eg:- 154" />
+
+    <EditText
+        android:id="@+id/routeStartRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Start" />
+
+    <EditText
+        android:id="@+id/routeDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Destination" />
+
+
+    <EditText
+        android:id="@+id/seatNumberRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Number of seats" />
+
+
+    <EditText
+        android:id="@+id/timeSlotRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Time Slot (e.g., 10:00 AM - 12:00 PM)" />
+
+
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Select Driver"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+
+    <Spinner
+        android:id="@+id/driverEmailRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="NIC" />
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Verification"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/ownerVerificationRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Your Email" />
+
+
+
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/registerBusButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="120dp"
+        android:text="Register Bus" />
+
+
+
+</LinearLayout>

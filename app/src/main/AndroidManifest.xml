@@ -45,6 +45,10 @@
         <activity android:name=".MyBookings" />
         <activity android:name=".NotificationSwapActivity" />
         <activity android:name=".HistoryFeedback" />
+        <activity android:name=".PassengerActivity" />
+        <activity android:name=".OwnerActivity" />
+
+
 
 
 

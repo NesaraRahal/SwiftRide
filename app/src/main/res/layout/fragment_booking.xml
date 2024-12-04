@@ -1,0 +1,136 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Inner RelativeLayout within LinearLayout -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Additional Views can go inside this RelativeLayout -->
+
+        <ImageView
+            android:id="@+id/busImg"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center_horizontal"
+            android:clickable="true"
+            android:focusable="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/modern_bus" />
+
+        <TextView
+            android:id="@+id/reserveBus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/busImg"
+            android:layout_marginLeft="100px"
+            android:layout_marginTop="150px"
+            android:layout_marginEnd="-185dp"
+            android:text="Reserve Your Seat"
+            android:textSize="19sp" />
+
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Start Point"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+    <Spinner
+        android:id="@+id/selectBusStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Start point" />
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Destination"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+    <Spinner
+        android:id="@+id/selectBusDestination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Destination" />
+
+    <TextView
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="Time"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+    <Spinner
+        android:id="@+id/selectBusTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Destination" />
+
+
+
+    <TextView
+        android:id="@+id/no_seats"
+        android:layout_width="142dp"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:text="No of Seats:"
+        android:layout_marginTop="50px"
+        android:textSize="20sp" />
+
+
+
+    <Button
+        android:id="@+id/reserveSeat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="reserveSeat"
+        android:text="Reserve a Seat" />
+
+    <Button
+        android:id="@+id/myBookings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="myBooks"
+        android:text="View My Bookings" />
+
+    <Button
+        android:id="@+id/myNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="viewNotification"
+        android:text="Notifications" />
+
+    <Button
+        android:id="@+id/viewPast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="viewHistory"
+        android:text="History and Feedback" />
+
+
+
+
+
+
+</LinearLayout>

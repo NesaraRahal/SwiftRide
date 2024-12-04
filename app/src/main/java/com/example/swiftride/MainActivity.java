@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
             String userType = checkUser(loginMail);
             if ("Passenger".equals(userType)) {
                 Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, DashboardActivity.class);
+                Intent intent = new Intent(this, PassengerActivity.class);
                 startActivity(intent);
             } else if ("Bus Driver".equals(userType)) {
                 Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
                 startActivity(intent);
             } else if ("Bus Owner".equals(userType)) {
                 Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, OwnerDashboardActivity.class);
+                Intent intent = new Intent(this, OwnerActivity.class);
                 startActivity(intent);
             } else {
                 Toast.makeText(this, "An error occurred while logging", Toast.LENGTH_SHORT).show();
