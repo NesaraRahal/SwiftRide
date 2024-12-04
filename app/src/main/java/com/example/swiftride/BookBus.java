@@ -130,6 +130,11 @@ public class BookBus extends Activity {
         startActivity(intent);
     }
 
+    public void viewHistory(View view){
+        Intent intent = new Intent(this, HistoryFeedback.class);
+        startActivity(intent);
+    }
+
 
 
 }

@@ -17,7 +17,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DB_NAME = "swiftridedb";
 
     // below int is our database version
-    private static final int DB_VERSION = 12;
+    private static final int DB_VERSION = 15;
 
     // User table
     private static final String TABLE_USER = "user";
@@ -73,6 +73,19 @@ public class DBHandler extends SQLiteOpenHelper {
 
     private static final String STATUS_COL = "status"; // Starting point of the trip
     private static final String TIME_COL_NOTIFICATION = "timeNotification"; // Destination point of the trip
+
+
+    // Feedback table name
+    private static final String TABLE_FEEDBACK = "feedback";
+
+    // Column names
+    private static final String FEEDBACK_ID_COL = "feedback_id"; // Primary key for the feedback table
+    private static final String USER_ID_FEEDBACK_COL = "user_id"; // Foreign key referencing the user table
+    private static final String BUS_ID_FEEDBACK_COL = "bus_id"; // Foreign key referencing the bus table
+    private static final String FEEDBACK_TEXT_COL = "feedback_text"; // Textual feedback provided by the user
+    private static final String RATING_COL = "rating"; // Numeric rating given by the user
+    private static final String TIME_COL_FEEDBACK = "timeFeedback"; // Timestamp for when the feedback was provided
+
 
 
 
@@ -153,6 +166,21 @@ public class DBHandler extends SQLiteOpenHelper {
 
 // Execute the SQL query to create the table
         db.execSQL(createNotificationTable);
+
+        String createFeedbackTable = "CREATE TABLE " + TABLE_FEEDBACK + " (" +
+                FEEDBACK_ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " + // Auto-increment for feedback ID
+                USER_ID_FEEDBACK_COL + " INTEGER NOT NULL, " + // User ID (Foreign key)
+                BUS_ID_FEEDBACK_COL + " INTEGER NOT NULL, " + // Bus ID (Foreign key)
+                FEEDBACK_TEXT_COL + " TEXT, " + // Textual feedback (optional)
+                RATING_COL + " INTEGER NOT NULL, " + // Rating (e.g., 1-5)
+                TIME_COL_FEEDBACK + " DATETIME DEFAULT CURRENT_TIMESTAMP, " + // Timestamp of feedback
+                "FOREIGN KEY (" + USER_ID_FEEDBACK_COL + ") REFERENCES " + TABLE_USER + "(" + USER_ID_COL + "), " + // Foreign key for user ID
+                "FOREIGN KEY (" + BUS_ID_FEEDBACK_COL + ") REFERENCES " + TABLE_BUS + "(" + BUS_ID_COL + ")" + // Foreign key for bus ID
+                ");";
+
+// Execute the SQL query to create the table
+        db.execSQL(createFeedbackTable);
+
 
 
     }
@@ -259,6 +287,25 @@ public class DBHandler extends SQLiteOpenHelper {
         db.insert(TABLE_NOTIFICATION, null, values);
         Log.e("DBHandler", "Notification data entered successfully");
         db.close(); // Close the database connection
+    }
+
+
+    //Insert Feedback
+    public void insertFeedback(Feedback feedback) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(USER_ID_FEEDBACK_COL, feedback.getUserId());
+        values.put(BUS_ID_FEEDBACK_COL, feedback.getBusId());
+        values.put(FEEDBACK_TEXT_COL, feedback.getFeedbackText());
+        values.put(RATING_COL, feedback.getRating());
+        values.put(TIME_COL_FEEDBACK, feedback.getTime());
+
+        db.insert(TABLE_FEEDBACK, null, values);
+        Log.e("DBHandler", "Feedback recorded successfully");
+
+        db.close();
+
+
     }
 
 
@@ -930,12 +977,73 @@ public class DBHandler extends SQLiteOpenHelper {
     }*/
 
 
+    // Retrieving user booking for feedback
+    public List<Booking> getUserBookings(int passengerId) {
+        List<Booking> bookings = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_RESERVATION + " WHERE " + PASSENGER_ID_COL + " = ?";
+
+        // Execute the query with the passengerId parameter
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(passengerId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                Booking booking = new Booking();
+
+                // Check column indices and retrieve the data only if valid
+                int reservationIdIndex = cursor.getColumnIndex(RESERVATION_ID_COL);
+                if (reservationIdIndex != -1) {
+                    booking.setReservationId(cursor.getInt(reservationIdIndex));
+                }
+
+                int reservationDateIndex = cursor.getColumnIndex(RESERVATION_DATE_COL);
+                if (reservationDateIndex != -1) {
+                    booking.setReservationDate(cursor.getString(reservationDateIndex));
+                }
+
+                int busIdIndex = cursor.getColumnIndex(BUS_ID_COL_Reservation);
+                if (busIdIndex != -1) {
+                    booking.setBusId(cursor.getInt(busIdIndex));
+                }
+
+                int seatNumberIndex = cursor.getColumnIndex(SEAT_NUMBER_COL);
+                if (seatNumberIndex != -1) {
+                    booking.setSeatNumber(cursor.getInt(seatNumberIndex));
+                }
+
+                int startPointIndex = cursor.getColumnIndex(START_POINT_COL);
+                if (startPointIndex != -1) {
+                    booking.setStartPoint(cursor.getString(startPointIndex));
+                }
+
+                int destinationPointIndex = cursor.getColumnIndex(DESTINATION_POINT_COL);
+                if (destinationPointIndex != -1) {
+                    booking.setDestinationPoint(cursor.getString(destinationPointIndex));
+                }
+
+                bookings.add(booking);
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return bookings;
+    }
+
+
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // this method is called to check if the table exists already.
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RESERVATION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUS);  // Add this line
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATION);  // Add this line
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_FEEDBACK);  // Add this line
+
+
         onCreate(db);
     }
 

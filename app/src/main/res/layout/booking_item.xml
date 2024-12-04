@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/busIdTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bus ID" />
+
+    <TextView
+        android:id="@+id/startPointTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Start Point" />
+
+    <TextView
+        android:id="@+id/destinationPointTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Destination Point" />
+
+    <TextView
+        android:id="@+id/seatNumberTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seat Number" />
+
+    <RatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5" />
+
+    <EditText
+        android:id="@+id/feedbackEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter feedback" />
+
+    <Button
+        android:id="@+id/submitFeedbackButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit Feedback" />
+</LinearLayout>
