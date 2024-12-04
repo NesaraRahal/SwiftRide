@@ -1,6 +1,5 @@
 package com.example.swiftride;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,10 +19,13 @@ import java.util.Locale;
 public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.ViewHolder> {
     private List<Booking> bookings;
     private Context context;
+    private int userId;  // Add userId to ensure feedback is filtered for the logged-in user
 
-    public FeedbackAdapter(Context context, List<Booking> bookings) {
+    // Constructor to receive the userId
+    public FeedbackAdapter(Context context, List<Booking> bookings, int userId) {
         this.context = context;
         this.bookings = bookings;
+        this.userId = userId;
     }
 
     @Override
@@ -35,26 +37,57 @@ public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Booking booking = bookings.get(position);
+
+        // Set booking information
         holder.busIdTextView.setText(String.valueOf(booking.getBusId()));
         holder.startPointTextView.setText(booking.getStartPoint());
         holder.destinationPointTextView.setText(booking.getDestinationPoint());
         holder.seatNumberTextView.setText(String.valueOf(booking.getSeatNumber()));
 
+        // Display feedback if available for the logged-in user and the current booking
+        List<Feedback> feedbackList = booking.getFeedbackList();
+        if (feedbackList != null && !feedbackList.isEmpty()) {
+            for (Feedback feedback : feedbackList) {
+                if (feedback.getUserId() == userId) {
+                    // If feedback exists for the logged-in user, show it in the UI
+                    holder.feedbackEditText.setText(feedback.getFeedbackText());
+                    holder.ratingBar.setRating(feedback.getRating());
+                    holder.submitFeedbackButton.setEnabled(false);  // Disable feedback submission if feedback already exists
+                }
+            }
+        }
+
+        // Submit feedback if it doesn't exist for the logged-in user
         holder.submitFeedbackButton.setOnClickListener(v -> {
-            // Get user input for feedback
             String feedbackText = holder.feedbackEditText.getText().toString();
             int rating = (int) holder.ratingBar.getRating();
 
-            // Save feedback
-            Feedback feedback = new Feedback();
-            feedback.setUserId(1); // Assuming logged-in user ID (change accordingly)
-            feedback.setBusId(booking.getBusId());
-            feedback.setFeedbackText(feedbackText);
-            feedback.setRating(rating);
-            feedback.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+            // Check if feedback is already provided, if not, submit it
+            boolean feedbackExists = false;
+            if (feedbackList != null) {
+                for (Feedback feedback : feedbackList) {
+                    if (feedback.getUserId() == userId) {
+                        feedbackExists = true;
+                        break;
+                    }
+                }
+            }
 
-            DBHandler dbHelper = new DBHandler(context);
-            dbHelper.insertFeedback(feedback);
+            if (!feedbackExists) {
+                // Save feedback to database
+                Feedback feedback = new Feedback();
+                feedback.setUserId(userId);  // Use logged-in user ID
+                feedback.setBusId(booking.getBusId());
+                feedback.setFeedbackText(feedbackText);
+                feedback.setRating(rating);
+                feedback.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date()));
+
+                DBHandler dbHelper = new DBHandler(context);
+                dbHelper.insertFeedback(feedback);
+                // Optionally, refresh the list or update UI to reflect new feedback
+                // feedbackList.add(feedback);  // Add feedback to local list (not strictly necessary)
+                notifyDataSetChanged();  // Refresh the RecyclerView to show the new feedback
+            }
         });
     }
 
@@ -81,4 +114,3 @@ public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.ViewHo
         }
     }
 }
-

@@ -4,45 +4,63 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Bus ID -->
     <TextView
         android:id="@+id/busIdTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Bus ID" />
 
+    <!-- Start Point -->
     <TextView
         android:id="@+id/startPointTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Start Point" />
 
+    <!-- Destination Point -->
     <TextView
         android:id="@+id/destinationPointTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Destination Point" />
 
+    <!-- Seat Number -->
     <TextView
         android:id="@+id/seatNumberTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Seat Number" />
 
+    <!-- Rating Bar -->
     <RatingBar
         android:id="@+id/ratingBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:numStars="5" />
 
+    <!-- EditText for entering feedback -->
     <EditText
         android:id="@+id/feedbackEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter feedback" />
 
+    <!-- Submit Button for feedback -->
     <Button
         android:id="@+id/submitFeedbackButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Submit Feedback" />
+
+    <!-- New Feedback TextView to display feedback -->
+    <TextView
+        android:id="@+id/feedbackTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Feedback will appear here"
+        android:textSize="14sp"
+        android:padding="8dp"
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone" /> <!-- Initially hidden -->
 </LinearLayout>

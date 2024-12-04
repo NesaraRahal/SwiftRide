@@ -1,5 +1,7 @@
 package com.example.swiftride;
 
+import java.util.List;
+
 public class Booking {
 
     private int reservationId;
@@ -8,6 +10,8 @@ public class Booking {
     private int seatNumber;
     private String startPoint;
     private String destinationPoint;
+    private List<Feedback> feedbackList; // Add feedback list
+
 
     // Constructor
     public Booking() {}
@@ -59,6 +63,14 @@ public class Booking {
 
     public void setDestinationPoint(String destinationPoint) {
         this.destinationPoint = destinationPoint;
+    }
+
+    public List<Feedback> getFeedbackList() {
+        return feedbackList;
+    }
+
+    public void setFeedbackList(List<Feedback> feedbackList) {
+        this.feedbackList = feedbackList;
     }
 
     // Override toString to display in ListView

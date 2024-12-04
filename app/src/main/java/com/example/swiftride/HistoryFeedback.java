@@ -39,8 +39,16 @@ public class HistoryFeedback extends Activity {
                 // If no bookings found, show a message
                 Toast.makeText(this, "No bookings found!", Toast.LENGTH_SHORT).show();
             } else {
+
+                // For each booking, fetch the feedback and set it
+                for (Booking booking : bookingList) {
+                    List<Feedback> feedbackList = dbHelper.getFeedbackForBooking(booking.getBusId(), userNic);
+                    booking.setFeedbackList(feedbackList);
+                }
+
                 // Create and set the adapter to the RecyclerView
-                feedbackAdapter = new FeedbackAdapter(this, bookingList);
+                // Pass userNic (userId) as the third argument
+                feedbackAdapter = new FeedbackAdapter(this, bookingList, userNic);
                 bookingRecyclerView.setAdapter(feedbackAdapter);
             }
         } else {

@@ -1032,6 +1032,56 @@ public class DBHandler extends SQLiteOpenHelper {
         return bookings;
     }
 
+    public List<Feedback> getFeedbackForBooking(int bookingId, int userId) {
+        List<Feedback> feedbackList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Updated query to filter feedback by both bookingId and userId
+        String query = "SELECT * FROM " + TABLE_FEEDBACK +
+                " WHERE " + BUS_ID_FEEDBACK_COL + " = ?" +
+                " AND " + USER_ID_FEEDBACK_COL + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(bookingId), String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Feedback feedback = new Feedback();
+
+                // Check if columns exist before getting their indexes
+                int feedbackIdIndex = cursor.getColumnIndex(FEEDBACK_ID_COL);
+                int userIdIndex = cursor.getColumnIndex(USER_ID_FEEDBACK_COL);
+                int busIdIndex = cursor.getColumnIndex(BUS_ID_FEEDBACK_COL);
+                int feedbackTextIndex = cursor.getColumnIndex(FEEDBACK_TEXT_COL);
+                int ratingIndex = cursor.getColumnIndex(RATING_COL);
+                int timeIndex = cursor.getColumnIndex(TIME_COL_FEEDBACK);
+
+                if (feedbackIdIndex != -1) {
+                    feedback.setFeedbackId(cursor.getInt(feedbackIdIndex));
+                }
+                if (userIdIndex != -1) {
+                    feedback.setUserId(cursor.getInt(userIdIndex));
+                }
+                if (busIdIndex != -1) {
+                    feedback.setBusId(cursor.getInt(busIdIndex));
+                }
+                if (feedbackTextIndex != -1) {
+                    feedback.setFeedbackText(cursor.getString(feedbackTextIndex));
+                }
+                if (ratingIndex != -1) {
+                    feedback.setRating(cursor.getInt(ratingIndex));
+                }
+                if (timeIndex != -1) {
+                    feedback.setTime(cursor.getString(timeIndex));
+                }
+
+                feedbackList.add(feedback);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+        return feedbackList;
+    }
+
 
 
     @Override
