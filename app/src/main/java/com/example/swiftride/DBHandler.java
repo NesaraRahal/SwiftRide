@@ -1162,8 +1162,8 @@ public class DBHandler extends SQLiteOpenHelper {
                 BUS_ID_COL_Reservation + ", " +
                 RESERVATION_DATE_COL +
                 " FROM " + TABLE_RESERVATION +
-                " WHERE " + DRIVER_ID_COL_Reservation + " = ?" +
-                " GROUP BY " + START_POINT_COL + ", " + DESTINATION_POINT_COL + ", " + BUS_ID_COL_Reservation + ", " + RESERVATION_DATE_COL;
+                " WHERE " + DRIVER_ID_COL_Reservation + " = ? " +
+                " GROUP BY " + START_POINT_COL;
 
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
