@@ -42,8 +42,8 @@ public class EmailSender {
     }
 
     private void sendMail() throws MessagingException {
-        final String username = ""; // Replace with your email
-        final String password = ""; // Replace with your app password
+        final String username = "developer.udithsandaruwan@gmail.com"; // Replace with your email
+        final String password = "aadg hjnq imzr onmq"; // Replace with your app password
 
         Properties properties = new Properties();
         properties.put("mail.smtp.host", "smtp.gmail.com");
