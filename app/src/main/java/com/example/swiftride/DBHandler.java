@@ -275,6 +275,32 @@ public class DBHandler extends SQLiteOpenHelper {
         return cursor; // Return the cursor, though you should ideally close it after using it
     }
 
+    public boolean updateUserProfile(String userName, String userEmail, String userDob, String password, int userId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(USER_NAME_COL, userName);
+        contentValues.put(USER_EMAIL_COL, userEmail);
+        contentValues.put(DOB_COL, userDob);
+        contentValues.put(PASSWORD_COL, password);
+
+        // Update the user profile in the database
+        int result = db.update(TABLE_USER, contentValues, USER_ID_COL + " = ?", new String[]{String.valueOf(userId)});
+
+        db.close();
+
+        // Log the result of the update operation
+        if (result > 0) {
+            Log.d("UpdateUserProfile", "Update successful for userId: " + userId);
+            return true;
+        } else {
+            Log.d("UpdateUserProfile", "Update failed for userId: " + userId);
+            return false;
+        }
+    }
+
+
+
 
 
 

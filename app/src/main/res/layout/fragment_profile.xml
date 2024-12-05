@@ -10,30 +10,65 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        android:src="@drawable/user"/>
+        android:src="@drawable/user" />
 
-    <TextView
+    <!-- User Name EditText (Initially Non-editable) -->
+    <EditText
         android:id="@+id/user_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="User Name"
+        android:hint="User Name"
         android:textSize="18sp"
         android:layout_marginTop="10dp"
-        android:gravity="center"/>
+        android:focusable="false"
+        android:clickable="false" />
 
-    <TextView
+    <!-- Email EditText (Initially Non-editable) -->
+    <EditText
         android:id="@+id/user_email"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Email"
+        android:hint="Email"
         android:textSize="16sp"
-        android:gravity="center"/>
+        android:focusable="false"
+        android:clickable="false" />
 
-    <TextView
+    <!-- Date of Birth EditText (Initially Non-editable) -->
+    <EditText
         android:id="@+id/user_dob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Date of Birth"
+        android:textSize="16sp"
+        android:focusable="false"
+        android:clickable="false" />
+
+    <!-- Edit Button -->
+    <Button
+        android:id="@+id/btn_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Date of Birth"
-        android:textSize="16sp"
-        android:gravity="center"/>
+        android:text="Edit"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp" />
+
+    <!-- Password EditText (Initially Invisible) -->
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter New Password"
+        android:inputType="textPassword"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 </LinearLayout>

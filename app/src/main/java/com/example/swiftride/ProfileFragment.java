@@ -1,6 +1,7 @@
 package com.example.swiftride;
 
 import static com.example.swiftride.DBHandler.DOB_COL;
+import static com.example.swiftride.DBHandler.PASSWORD_COL;
 import static com.example.swiftride.DBHandler.PROFILE_IMG_COL;
 import static com.example.swiftride.DBHandler.USER_EMAIL_COL;
 import static com.example.swiftride.DBHandler.USER_NAME_COL;
@@ -8,6 +9,7 @@ import static com.example.swiftride.MainActivity.loginMail;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -18,8 +20,9 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -33,17 +36,28 @@ public class ProfileFragment extends Fragment {
     private static final int REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 1;
 
     private ImageView profileImageView;
-    private TextView userNameTextView, userEmailTextView, userDobTextView;
+    private EditText userNameEditText, userEmailEditText, userDobEditText, passwordEditText;
+    private Button editButton, saveButton;
+
+    private boolean isEditing = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the fragment layout
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        // Initialize views
         profileImageView = view.findViewById(R.id.profile_image);
-        userNameTextView = view.findViewById(R.id.user_name);
-        userEmailTextView = view.findViewById(R.id.user_email);
-        userDobTextView = view.findViewById(R.id.user_dob);
+        userNameEditText = view.findViewById(R.id.user_name);
+        userEmailEditText = view.findViewById(R.id.user_email);
+        userDobEditText = view.findViewById(R.id.user_dob);
+        passwordEditText = view.findViewById(R.id.edit_password);
+        editButton = view.findViewById(R.id.btn_edit);
+        saveButton = view.findViewById(R.id.btn_save);
+
+        // Set up button listeners
+        editButton.setOnClickListener(v -> toggleEditMode());
+        saveButton.setOnClickListener(v -> saveUserProfile());
 
         // Check if permission is granted
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -55,11 +69,27 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    private void toggleEditMode() {
+        isEditing = !isEditing;
+
+        // Toggle edit mode for all EditTexts
+        userNameEditText.setFocusableInTouchMode(isEditing);
+        userEmailEditText.setFocusableInTouchMode(isEditing);
+        userDobEditText.setFocusableInTouchMode(isEditing);
+
+        // Show or hide password field
+        passwordEditText.setVisibility(isEditing ? View.VISIBLE : View.GONE);
+
+        // Update button text
+        editButton.setText(isEditing ? "Cancel" : "Edit");
+        saveButton.setVisibility(isEditing ? View.VISIBLE : View.GONE);
+    }
+
     private void loadUserProfile() {
         DBHandler dbHandler = new DBHandler(getContext());
 
         // Assume nicUser is fetched from the session or passed as an argument
-        int nicUser = dbHandler.getUserNic(loginMail); // Assuming loginMail is the email and nicUser is fetched from there
+        int nicUser = dbHandler.getUserNic(loginMail);
 
         // Get user profile data from the database
         Cursor cursor = dbHandler.getUserProfile(getContext(), nicUser);
@@ -71,56 +101,69 @@ public class ProfileFragment extends Fragment {
             int userDobIndex = cursor.getColumnIndex(DOB_COL);
             int profileImgPathIndex = cursor.getColumnIndex(PROFILE_IMG_COL);
 
-            // Retrieve the user details, with default values if columns are not found
-            String userName = (userNameIndex != -1) ? cursor.getString(userNameIndex) : "N/A";
-            String userEmail = (userEmailIndex != -1) ? cursor.getString(userEmailIndex) : "N/A";
-            String userDob = (userDobIndex != -1) ? cursor.getString(userDobIndex) : "N/A";
-            String profileImgPath = (profileImgPathIndex != -1) ? cursor.getString(profileImgPathIndex) : "";
+            // Retrieve the user details
+            String userName = cursor.getString(userNameIndex);
+            String userEmail = cursor.getString(userEmailIndex);
+            String userDob = cursor.getString(userDobIndex);
+            String profileImgPath = cursor.getString(profileImgPathIndex);
 
-            // Set the retrieved values to the TextViews
-            userNameTextView.setText(userName);
-            userEmailTextView.setText(userEmail);
-            userDobTextView.setText(userDob);
+            // Set values in the EditTexts
+            userNameEditText.setText(userName);
+            userEmailEditText.setText(userEmail);
+            userDobEditText.setText(userDob);
 
-            // Set profile image if available
+            // Set profile image
             if (profileImgPath != null && !profileImgPath.isEmpty()) {
                 Bitmap profileImage = getProfileImage(getContext(), profileImgPath);
                 if (profileImage != null) {
                     profileImageView.setImageBitmap(profileImage);
                 } else {
-                    // Default image if profile image is null or cannot be loaded
                     profileImageView.setImageResource(R.drawable.user);
                 }
             } else {
-                // Default image if no profile image path is found
                 profileImageView.setImageResource(R.drawable.user);
             }
+
+            // Disable editing by default
+            toggleEditMode();
         } else {
-            // Handle case when no user data is found
-            userNameTextView.setText("N/A");
-            userEmailTextView.setText("N/A");
-            userDobTextView.setText("N/A");
-            profileImageView.setImageResource(R.drawable.user);
+            Toast.makeText(getContext(), "Failed to load user profile", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveUserProfile() {
+        String userName = userNameEditText.getText().toString();
+        String userEmail = userEmailEditText.getText().toString();
+        String userDob = userDobEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+
+        DBHandler dbHandler = new DBHandler(getContext());
+
+        int id = dbHandler.getUserNic(loginMail);
+        // Save user profile to the database
+        boolean success = dbHandler.updateUserProfile(userName, userEmail, userDob, password, id);
+        if (success) {
+            Toast.makeText(getContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show();
+            toggleEditMode();
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            startActivity(intent);
+
+        } else {
+            Toast.makeText(getContext(), "Failed to update profile.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private Bitmap getProfileImage(Context context, String profileImgPath) {
         if (profileImgPath.startsWith("content://")) {
             try {
-                // Create a URI from the content path
                 Uri imageUri = Uri.parse(profileImgPath);
-
-                // Use ContentResolver to get an InputStream for the image
                 InputStream imageStream = context.getContentResolver().openInputStream(imageUri);
-
-                // Decode the InputStream into a Bitmap
                 return BitmapFactory.decodeStream(imageStream);
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
         } else {
-            // If the path is a regular file path, decode it directly
             return BitmapFactory.decodeFile(profileImgPath);
         }
     }

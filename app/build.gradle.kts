@@ -60,10 +60,15 @@ dependencies {
     implementation(libs.cardview)
     implementation(libs.osmdroid)
 
+    implementation(libs.okhttp) // Added for OkHttp
+
+
     implementation(libs.glide)
     implementation(libs.lottie)
 
     implementation(libs.javamail)
     implementation(libs.activation)
-    
+
+
+
 }

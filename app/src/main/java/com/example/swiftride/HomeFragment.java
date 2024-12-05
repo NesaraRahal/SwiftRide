@@ -71,7 +71,7 @@ public class HomeFragment extends Fragment {
         return rootView;
     }
 
-    
+
 
     // Method to add city markers and handle marker interactions
     private void addCityMarkers(List<String> cities, HashMap<String, GeoPoint> coordinates) {
